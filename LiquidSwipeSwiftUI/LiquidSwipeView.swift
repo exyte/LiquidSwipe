@@ -20,11 +20,13 @@ struct WaveView: Shape {
     
     var draggingPoint: CGPoint
     var isDragging: Bool
+    var reloadTriggered = false
     let alignment: WaveAlignment
     
-    init(draggingPoint: CGPoint, isDragging: Bool, alignment: WaveAlignment) {
+    init(draggingPoint: CGPoint, isDragging: Bool, reloadTriggered: Bool, alignment: WaveAlignment) {
         self.draggingPoint = draggingPoint
         self.isDragging = isDragging
+        self.reloadTriggered = reloadTriggered
         self.alignment = alignment
     }
     
@@ -91,11 +93,15 @@ struct WaveView: Shape {
 
         path.addLine(to: point2)
         
-        let control2 = CGPoint(x: point3.x * 2, y: point3.y)
+        var control2X = point3.x * 2
+        if alignment == .right {
+            control2X = UIScreen.main.bounds.size.width - (UIScreen.main.bounds.size.width - point3.x) * 2
+        }
+        let control2 = CGPoint(x: control2X, y: point3.y)
         path.addCurve(to: point4, control1: point2, control2: control2)
         path.addLine(to: point5)
 
-       // path.closeSubpath()
+        path.closeSubpath()
 
         return path
     }
