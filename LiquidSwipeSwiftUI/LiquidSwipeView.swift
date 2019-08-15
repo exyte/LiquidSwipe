@@ -8,31 +8,59 @@
 
 import SwiftUI
 
-struct LiquidSwipeView: Shape {
+let pad: CGFloat = 16.0
+let circleRadius: CGFloat = 25.0
+
+enum WaveAlignment {
+    case left
+    case right
+}
+
+struct WaveView: Shape {
     
     var draggingPoint: CGPoint
     var isDragging: Bool
+    let alignment: WaveAlignment
     
-    init(draggingPoint: CGPoint, isDragging: Bool) {
+    init(draggingPoint: CGPoint, isDragging: Bool, alignment: WaveAlignment) {
         self.draggingPoint = draggingPoint
         self.isDragging = isDragging
+        self.alignment = alignment
     }
     
     func path(in rect: CGRect) -> Path {
-  
-        let intervals = Array(stride(from: Length(0.0), to: rect.size.height, by: 50))
-        var points = intervals
-            .map { (16, $0) }
-            .map(CGPoint.init)
         
-        points.append(CGPoint(x: 16, y: rect.size.height))
-        points.append(CGPoint(x: 0, y: rect.size.height))
+        let screenCornerX = alignment == .left ? 0 : UIScreen.main.bounds.size.width
+        let screenCornerPadX = alignment == .left ? pad : UIScreen.main.bounds.size.width - pad
+        
+        var points = [
+            CGPoint(x: screenCornerX, y: 0),
+            CGPoint(x: screenCornerPadX, y: 0),
+            CGPoint(x: screenCornerPadX, y: rect.size.height / 2),
+            CGPoint(x: screenCornerPadX, y: rect.size.height),
+            CGPoint(x: screenCornerX, y: rect.size.height)
+        ]
         
         if let foundIndex = findIndex(for: draggingPoint, from: points) {
             points[foundIndex] = draggingPoint
         }
         
-        return interpolateWithCatmullRom(points)
+        var wave = wavePath(points)
+        
+        //add circle
+        wave.move(to: draggingPoint)
+        wave.addEllipse(in: circleRect())
+        
+        return wave
+    }
+    
+    func circleRect() -> CGRect {
+        let rect = CGRect(x: draggingPoint.x - circleRadius,
+                          y: draggingPoint.y - circleRadius,
+                          width: circleRadius * 2.0,
+                          height: circleRadius * 2.0)
+        
+        return rect
     }
     
     func findIndex(for draggingPoint: CGPoint, from points: [CGPoint]) -> Int? {
@@ -41,27 +69,34 @@ struct LiquidSwipeView: Shape {
             return nil
         }
         
-        for (index, point) in points.enumerated() {
-            if point.y > draggingPoint.y {
-                return index
-            }
-        }
+//        for (index, point) in points.enumerated() {
+//            if point.y > draggingPoint.y {
+//                return index
+//            }
+//        }
         
-        return nil
+        return 2
     }
     
-    fileprivate func interpolateWithCatmullRom(_ points: [CGPoint]) -> Path {
+    fileprivate func wavePath(_ points: [CGPoint]) -> Path {
         var path = Path()
         
-        path.move(to: CGPoint.zero)
-        
-        for index in points.startIndex..<points.endIndex {
-            let point = points[index]
-            path.addLine(to: point)
-        }
-        path.closeSubpath()
+        let point1 = points[0]
+        let point2 = points[1]
+        let point3 = points[2]
+        let point4 = points[3]
+        let point5 = points[4]
 
+        path.move(to: point1)
+
+        path.addLine(to: point2)
         
+        let control2 = CGPoint(x: point3.x * 2, y: point3.y)
+        path.addCurve(to: point4, control1: point2, control2: control2)
+        path.addLine(to: point5)
+
+       // path.closeSubpath()
+
         return path
     }
     

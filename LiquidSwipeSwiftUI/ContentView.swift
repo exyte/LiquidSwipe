@@ -169,9 +169,6 @@ import SwiftUI
 //    }
 //}
 
-
-//import SwiftUIPathAnimations
-
 struct ContentView: View {
     
     @State var draggingPoint: CGPoint = .zero
@@ -179,8 +176,24 @@ struct ContentView: View {
     
     var body: some View {
         
-        shape()
-            .foregroundColor(Color.blue)
+        wave(alingment: .left)
+        
+    }
+    
+    func wave(alingment: WaveAlignment) -> some View {
+        
+        let color = alingment == .left ? Color.blue : Color.red
+        let endDragginPointX = alingment == .left ? pad : UIScreen.main.bounds.size.width - pad
+        
+        func path(in rect: CGRect) -> Path {
+            return WaveView(draggingPoint: draggingPoint, isDragging: isDragging, alignment: alingment).path(in: rect)
+        }
+        
+        return GeometryReader { geometry -> AnyView in
+            let rect = geometry.frame(in: CoordinateSpace.local)
+            return AnyView(SimilarShape(path: path(in: rect)))
+        }
+        .foregroundColor(color)
             .gesture(DragGesture()
                 .onChanged { result in
                     self.draggingPoint = result.location
@@ -188,22 +201,10 @@ struct ContentView: View {
             }
             .onEnded { result in
                 withAnimation(.spring()) {
+                    self.draggingPoint = CGPoint(x: endDragginPointX, y: self.draggingPoint.y)
                     self.isDragging = false
                 }
             })
-        
     }
-    
-    func shape() -> some View {
-        func path(in rect: CGRect) -> Path {
-            return LiquidSwipeView(draggingPoint: draggingPoint, isDragging: isDragging).path(in: rect)
-        }
-        
-        return GeometryReader { geometry -> AnyView in
-            let rect = geometry.frame(in: CoordinateSpace.local)
-            return AnyView(SimilarShape(path: path(in: rect)))
-        }
-    }
-    
     
 }
