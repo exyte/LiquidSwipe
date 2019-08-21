@@ -30,8 +30,8 @@ struct WaveView: Shape {
     
     func path(in rect: CGRect) -> Path {
         let dx = alignment == .left ? draggingPoint.x : -draggingPoint.x
-        var progress = getProgress(dx: dx)
-        print(progress)
+        var progress = WaveView.getProgress(dx: dx)
+        
         if !isDragging {
             let success = progress > 0.15
             progress = self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
@@ -39,7 +39,6 @@ struct WaveView: Shape {
         
         return build(cy: draggingPoint.y, p: progress)
     }
-    
     
     private let sizeW: CGFloat = UIScreen.main.bounds.size.width
     private let sizeH: CGFloat = UIScreen.main.bounds.size.height
@@ -85,7 +84,7 @@ struct WaveView: Shape {
         return path
     }
     
-    private func getProgress(dx: CGFloat) -> CGFloat {
+    static func getProgress(dx: CGFloat) -> CGFloat {
         return min(1.0, max(0, dx * 0.45 / UIScreen.main.bounds.size.width))
     }
     
