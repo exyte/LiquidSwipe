@@ -20,19 +20,23 @@ struct WaveView: Shape {
     
     var draggingPoint: CGPoint
     var isDragging: Bool
-    var reloadTriggered = false
     let alignment: WaveAlignment
     
-    init(draggingPoint: CGPoint, isDragging: Bool, reloadTriggered: Bool, alignment: WaveAlignment) {
+    init(draggingPoint: CGPoint, isDragging: Bool, alignment: WaveAlignment) {
         self.draggingPoint = draggingPoint
         self.isDragging = isDragging
-        self.reloadTriggered = reloadTriggered
         self.alignment = alignment
     }
     
     func path(in rect: CGRect) -> Path {
         let dx = alignment == .left ? draggingPoint.x : -draggingPoint.x
-        let progress = getProgress(dx: dx)
+        var progress = getProgress(dx: dx)
+        print(progress)
+        if !isDragging {
+            let success = progress > 0.15
+            progress = self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
+        }
+        
         return build(cy: draggingPoint.y, p: progress)
     }
     

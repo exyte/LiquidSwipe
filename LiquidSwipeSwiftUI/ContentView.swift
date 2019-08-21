@@ -203,13 +203,11 @@ struct ContentView: View {
     @State var leftWaveZIndex: Double = 1
     @State var leftDraggingPoint: CGPoint = CGPoint(x: pad, y: 100)
     @State var leftIsDragging: Bool = false
-    @State var leftReloadTriggered: Bool = false
     @State var leftColor: Color = LiquidSwipeSettings.shared.nextColor
     
-    let rightWaveZIndex: Double = 2
+    @State var rightWaveZIndex: Double = 2
     @State var rightDraggingPoint: CGPoint = CGPoint(x: pad, y: 300)
     @State var rightIsDragging: Bool = false
-    @State var rightReloadTriggered: Bool = false
     @State var rightColor: Color = LiquidSwipeSettings.shared.nextColor
     
     var body: some View {
@@ -221,7 +219,7 @@ struct ContentView: View {
 
     func leftWave() -> some View {
         func path(in rect: CGRect) -> Path {
-            return WaveView(draggingPoint: leftDraggingPoint, isDragging: leftIsDragging, reloadTriggered: leftReloadTriggered, alignment: .left ).path(in: rect)
+            return WaveView(draggingPoint: leftDraggingPoint, isDragging: leftIsDragging, alignment: .left ).path(in: rect)
         }
         
         return GeometryReader { geometry -> AnyView in
@@ -231,32 +229,23 @@ struct ContentView: View {
         .foregroundColor(leftColor)
             .gesture(DragGesture()
                 .onChanged { result in
-                    self.leftWaveZIndex = 3
+                    self.leftWaveZIndex = 2
+                    self.rightWaveZIndex = 1
                     
-                    self.leftDraggingPoint = CGPoint(x: result.translation.width, y: result.location.y)
                     self.leftIsDragging = true
-                    
-//                    let triggerPoint = UIScreen.main.bounds.size.width * 0.7
-//                    if self.leftDraggingPoint.x > triggerPoint {
-//                        if !self.leftReloadTriggered {
-//                            self.leftColor = LiquidSwipeSettings.shared.nextColor
-//                            self.leftReloadTriggered = true
-//                        }
-//                    }
+                    self.leftDraggingPoint = CGPoint(x: result.translation.width, y: result.location.y)
             }
             .onEnded { result in
                 withAnimation(.spring()) {
-                    self.leftWaveZIndex = 1
-                    self.leftDraggingPoint = CGPoint(x: pad, y: self.leftDraggingPoint.y)
                     self.leftIsDragging = false
-                    self.leftReloadTriggered = false
+                    self.leftDraggingPoint = CGPoint(x: result.translation.width, y: result.location.y)
                 }
             })
     }
     
     func rightWave() -> some View {
         func path(in rect: CGRect) -> Path {
-            return WaveView(draggingPoint: rightDraggingPoint, isDragging: rightIsDragging, reloadTriggered: rightReloadTriggered, alignment: .right).path(in: rect)
+            return WaveView(draggingPoint: rightDraggingPoint, isDragging: rightIsDragging, alignment: .right).path(in: rect)
         }
         
         return GeometryReader { geometry -> AnyView in
@@ -266,23 +255,16 @@ struct ContentView: View {
         .foregroundColor(rightColor)
             .gesture(DragGesture()
                 .onChanged { result in
+                    self.leftWaveZIndex = 1
+                    self.rightWaveZIndex = 2
                     
-                    self.rightDraggingPoint = CGPoint(x: result.translation.width, y: result.location.y)
                     self.rightIsDragging = true
-                    
-//                    let triggerPoint = UIScreen.main.bounds.size.width * 0.3
-//                    if self.rightDraggingPoint.x < triggerPoint {
-//                        if !self.rightReloadTriggered {
-//                            self.rightColor = LiquidSwipeSettings.shared.prevColor
-//                            self.rightReloadTriggered = true
-//                        }
-//                    }
+                    self.rightDraggingPoint = CGPoint(x: result.translation.width, y: result.location.y)
             }
             .onEnded { result in
                 withAnimation(.spring()) {
-                    self.rightDraggingPoint = CGPoint(x: pad, y: self.rightDraggingPoint.y)
                     self.rightIsDragging = false
-                    self.rightReloadTriggered = false
+                    self.rightDraggingPoint = CGPoint(x: result.translation.width, y: result.location.y)
                 }
             })
     }
