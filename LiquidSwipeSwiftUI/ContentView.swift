@@ -233,7 +233,9 @@ struct ContentView: View {
         
         if progress > 0.15 {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.backColor = actionWaveAlignment == .left ? self.rightColor : self.leftColor
+                let waveColor = actionWaveAlignment == .left ? self.leftColor : self.rightColor
+                
+                self.backColor = waveColor
                 
                 self.leftColor = LiquidSwipeSettings.shared.nextColor
                 self.rightColor = LiquidSwipeSettings.shared.nextColor
