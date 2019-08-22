@@ -187,15 +187,6 @@ struct ContentView: View {
     }
     
     func rightCircle() -> some View {
-//        func path(in rect: CGRect) -> Path {
-//            return CircleView(draggingPoint: rightDraggingPoint, isDragging: rightIsDragging, alignment: .right).path(in: rect)
-//        }
-//
-//        return GeometryReader { geometry -> AnyView in
-//            let rect = geometry.frame(in: CoordinateSpace.local)
-//            return AnyView(SimilarShape(path: path(in: rect)))
-//        }
-        
         let w = Length(circleRadius * 2.0)
         let color = Color(hex: 0x000000, alpha: 0.2)
         
