@@ -81,7 +81,7 @@ struct ContentView: View {
     @State var leftIsDragging: Bool = false
     @State var leftColor: Color = LiquidSwipeSettings.shared.nextColor
     
-    @State var rightWaveZIndex: Double = 2
+    @State var rightWaveZIndex: Double = 4
     @State var rightDraggingPoint: DragPointData = DragPointData(point: CGPoint(x: 0, y: 300), translation: CGSize(width: pad, height: 0))
     @State var rightDraggingPointAdjusted: CGPoint = CGPoint(x: sizeW - circleRadius - 4, y: 300)
     @State var rightDraggingOpacity: Double = 1
@@ -93,13 +93,12 @@ struct ContentView: View {
             backPath().foregroundColor(backColor)
             
             leftWave().zIndex(leftWaveZIndex)
+            leftCircle().zIndex(leftWaveZIndex + 1)
+            leftArrow().zIndex(leftWaveZIndex + 2)
+            
             rightWave().zIndex(rightWaveZIndex)
-            
-            leftCircle().zIndex(10)
-            rightCircle().zIndex(11)
-            
-            leftArrow().zIndex(12)
-            rightArrow().zIndex(13)
+            rightCircle().zIndex(rightWaveZIndex + 1)
+            rightArrow().zIndex(rightWaveZIndex + 2)
         }
     }
     
