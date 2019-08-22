@@ -11,42 +11,93 @@ import SwiftUI
 let pad: CGFloat = 16.0
 let circleRadius: CGFloat = 25.0
 
+let sizeW: CGFloat = UIScreen.main.bounds.size.width
+let sizeH: CGFloat = UIScreen.main.bounds.size.height
+
 enum WaveAlignment {
     case left
     case right
 }
 
-struct WaveView: Shape {
+struct DragPointData: Equatable {
+    var point: CGPoint
+    var translation: CGSize
+}
+
+struct CircleView: Shape {
     
-    var draggingPoint: CGPoint
+    var draggingPoint: DragPointData
     var isDragging: Bool
     let alignment: WaveAlignment
     
-    init(draggingPoint: CGPoint, isDragging: Bool, alignment: WaveAlignment) {
+    init(draggingPoint: DragPointData, isDragging: Bool, alignment: WaveAlignment) {
         self.draggingPoint = draggingPoint
         self.isDragging = isDragging
         self.alignment = alignment
     }
     
     func path(in rect: CGRect) -> Path {
-        let dx = alignment == .left ? draggingPoint.x : -draggingPoint.x
+        let dx = alignment == .left ? draggingPoint.translation.width : -draggingPoint.translation.width
         var progress = WaveView.getProgress(dx: dx)
         
         if !isDragging {
             let success = progress > 0.15
-            progress = self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
+            progress = WaveView.self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
         }
         
-        return build(cy: draggingPoint.y, p: progress)
+        return build(cy: draggingPoint.point.y, p: progress)
     }
     
-    private let sizeW: CGFloat = UIScreen.main.bounds.size.width
-    private let sizeH: CGFloat = UIScreen.main.bounds.size.height
+    private func build(cy: CGFloat, p: CGFloat) -> Path {
+        let side = WaveView.adjust(from: 15, to: sizeW, p: p, min: 0.2, max: 0.8)
+        let hr = WaveView.getHr(from: 48, to: sizeW * 0.8, p: p)
+        let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: p, max: 0.4)
+        let opacity = max(1 - p * 5, 0)
+        return build(cy: cy, hr: hr, vr: vr, side: side, opacity: opacity)
+    }
+    
+    private func build(cy: CGFloat, hr: CGFloat, vr: CGFloat, side: CGFloat, opacity: CGFloat) -> Path {
+        let xSide = alignment == .left ? side : sizeW - side
+        let sign: CGFloat = alignment == .left ? 1.0 : -1.0
+        
+        var path = Path()
+    
+        let dx = xSide + sign * hr
+        path.move(to: CGPoint(x: dx, y: cy))
+        path.addEllipse(in: CGRect(x: dx + 12, y: cy - 24, width: 48, height: 48))
+        
+        return path
+    }
+}
+
+struct WaveView: Shape {
+    
+    var draggingPoint: DragPointData
+    var isDragging: Bool
+    let alignment: WaveAlignment
+    
+    init(draggingPoint: DragPointData, isDragging: Bool, alignment: WaveAlignment) {
+        self.draggingPoint = draggingPoint
+        self.isDragging = isDragging
+        self.alignment = alignment
+    }
+    
+    func path(in rect: CGRect) -> Path {
+        let dx = alignment == .left ? draggingPoint.translation.width : -draggingPoint.translation.width
+        var progress = WaveView.getProgress(dx: dx)
+        
+        if !isDragging {
+            let success = progress > 0.15
+            progress = WaveView.self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
+        }
+        
+        return build(cy: draggingPoint.point.y, p: progress)
+    }
     
     private func build(cy: CGFloat, p: CGFloat) -> Path {
-        let side = adjust(from: 15, to: sizeW, p: p, min: 0.2, max: 0.8)
-        let hr = getHr(from: 48, to: sizeW * 0.8, p: p)
-        let vr = adjust(from: 82, to: sizeH * 0.9, p: p, max: 0.4)
+        let side = WaveView.adjust(from: 15, to: sizeW, p: p, min: 0.2, max: 0.8)
+        let hr = WaveView.getHr(from: 48, to: sizeW * 0.8, p: p)
+        let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: p, max: 0.4)
         let opacity = max(1 - p * 5, 0)
         return build(cy: cy, hr: hr, vr: vr, side: side, opacity: opacity)
     }
@@ -88,7 +139,7 @@ struct WaveView: Shape {
         return min(1.0, max(0, dx * 0.45 / UIScreen.main.bounds.size.width))
     }
     
-    private func getHr(from: CGFloat, to: CGFloat, p: CGFloat) -> CGFloat {
+    static func getHr(from: CGFloat, to: CGFloat, p: CGFloat) -> CGFloat {
         let p1: CGFloat = 0.4
         if p <= p1 {
             return adjust(from: from, to: to, p: p, max: p1)
@@ -102,13 +153,36 @@ struct WaveView: Shape {
         return to * exp(-beta * t) * cos(omega * t)
     }
     
-    private func adjust(from: CGFloat, to: CGFloat, p: CGFloat, min: CGFloat = 0, max: CGFloat = 1) -> CGFloat {
+    static func adjust(from: CGFloat, to: CGFloat, p: CGFloat, min: CGFloat = 0, max: CGFloat = 1) -> CGFloat {
         if p <= min {
             return from
         } else if p >= max {
             return to
         }
         return from + (to - from) * (p - min) / (max - min)
+    }
+    
+    static func adjustedDragPoint(point: CGPoint, alignment: WaveAlignment) -> (CGPoint, Double) {
+        var dx = alignment == .left ? point.x : -point.x
+        let progress = WaveView.getProgress(dx: dx)
+        
+        //        if !isDragging {
+        //            let success = progress > 0.15
+        //            progress = WaveView.self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
+        //        }
+        
+        let side = WaveView.adjust(from: 15, to: sizeW, p: progress, min: 0.2, max: 0.8)
+        let hr = WaveView.getHr(from: 48, to: sizeW * 0.8, p: progress)
+      //  let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: progress, max: 0.4)
+        let opacity = max(1 - progress * 5, 0)
+        
+        let xSide = alignment == .left ? side : sizeW - side
+        let sign: CGFloat = alignment == .left ? 1.0 : -1.0
+        
+        dx = xSide + sign * hr
+        let dx2 = alignment == .left ? -circleRadius - 8 : circleRadius + 8
+        
+        return (CGPoint(x: dx + dx2, y: point.y), Double(opacity))
     }
     
     private static let data: [CGFloat] = [
