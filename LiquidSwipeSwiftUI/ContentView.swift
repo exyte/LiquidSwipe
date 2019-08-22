@@ -127,7 +127,7 @@ struct ContentView: View {
         .foregroundColor(leftColor)
             .gesture(DragGesture()
                 .onChanged { result in
-                    self.leftWaveZIndex = 2
+                    self.leftWaveZIndex = 4
                     self.rightWaveZIndex = 1
                     
                     self.leftIsDragging = true
@@ -164,7 +164,7 @@ struct ContentView: View {
             .gesture(DragGesture()
                 .onChanged { result in
                     self.leftWaveZIndex = 1
-                    self.rightWaveZIndex = 2
+                    self.rightWaveZIndex = 4
                     
                     self.rightIsDragging = true
                     self.rightDraggingPoint = DragPointData(point: result.location, translation: result.translation)
