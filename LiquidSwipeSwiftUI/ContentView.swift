@@ -42,11 +42,8 @@ struct ContentView: View {
     
     func backPath() -> Path {
         var path = Path()
-        
-        path.move(to: CGPoint(x: 0, y: -100))
-        path.addLine(to: CGPoint(x: UIScreen.main.bounds.size.width, y: -100))
-        path.addLine(to: CGPoint(x: UIScreen.main.bounds.size.width, y: UIScreen.main.bounds.size.height))
-        path.addLine(to: CGPoint(x: 0, y: UIScreen.main.bounds.size.height))
+    
+        path.addRect(CGRect(x: 0, y: -88, width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height + 88))
         
         return path
     }
