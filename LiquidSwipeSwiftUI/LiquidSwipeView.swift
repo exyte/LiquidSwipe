@@ -20,33 +20,31 @@ struct DragPointData: Equatable {
 
 struct WaveView: Shape {
     
-    var draggingPoint: DragPointData
-    var isDragging: Bool
+    var animatableData: AnimatablePair<CGFloat, CGFloat> {
+        get { AnimatablePair(draggingPoint.x, draggingPoint.y) }
+        set {
+            draggingPoint.x = newValue.first
+            draggingPoint.y = newValue.second
+        }
+    }
+    
+    var draggingPoint: CGPoint
     let alignment: WaveAlignment
     
-    init(draggingPoint: DragPointData, isDragging: Bool, alignment: WaveAlignment) {
+    init(draggingPoint: CGPoint, alignment: WaveAlignment) {
         self.draggingPoint = draggingPoint
-        self.isDragging = isDragging
         self.alignment = alignment
     }
     
     func path(in rect: CGRect) -> Path {
-        let dx = alignment == .left ? draggingPoint.translation.width : -draggingPoint.translation.width
-        var progress = WaveView.getProgress(dx: dx)
-        
-        if !isDragging {
-            let success = progress > 0.15
-            progress = WaveView.self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
-        }
-        
-        return build(cy: draggingPoint.point.y, p: progress)
+        return build(cy: draggingPoint.y, progress: draggingPoint.x)
     }
     
-    private func build(cy: CGFloat, p: CGFloat) -> Path {
-        let side = WaveView.adjust(from: 15, to: sizeW, p: p, min: 0.2, max: 0.8)
-        let hr = WaveView.getHr(from: 48, to: sizeW * 0.8, p: p)
-        let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: p, max: 0.4)
-        let opacity = max(1 - p * 5, 0)
+    private func build(cy: CGFloat, progress: CGFloat) -> Path {
+        let side = WaveView.adjust(from: 15, to: sizeW, p: progress, min: 0.2, max: 0.8)
+        let hr = WaveView.getHr(from: 48, to: sizeW * 0.8, p: progress)
+        let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: progress, max: 0.4)
+        let opacity = max(1 - progress * 5, 0)
         return build(cy: cy, hr: hr, vr: vr, side: side, opacity: opacity)
     }
     
