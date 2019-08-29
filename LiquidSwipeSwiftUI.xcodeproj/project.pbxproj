@@ -7,12 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		423BFC4E23015F6F00CD4856 /* Path+Length.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423BFC4823015F6F00CD4856 /* Path+Length.swift */; };
-		423BFC4F23015F6F00CD4856 /* Array+VectorArithmetic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423BFC4923015F6F00CD4856 /* Array+VectorArithmetic.swift */; };
-		423BFC5023015F6F00CD4856 /* InterpolatedShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423BFC4A23015F6F00CD4856 /* InterpolatedShape.swift */; };
-		423BFC5123015F6F00CD4856 /* AnimatableDataSimilarShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423BFC4B23015F6F00CD4856 /* AnimatableDataSimilarShape.swift */; };
-		423BFC5223015F6F00CD4856 /* Path+VectorArithmetic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423BFC4C23015F6F00CD4856 /* Path+VectorArithmetic.swift */; };
-		423BFC5323015F6F00CD4856 /* SimilarShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423BFC4D23015F6F00CD4856 /* SimilarShape.swift */; };
 		423BFC572301BE0000CD4856 /* LiquidSwipeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 423BFC562301BE0000CD4856 /* LiquidSwipeView.swift */; };
 		4266D0D6230EA92900001C42 /* LiquidSwipeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4266D0D5230EA92900001C42 /* LiquidSwipeSettings.swift */; };
 		42D891A222FC618D004105D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D891A122FC618D004105D9 /* AppDelegate.swift */; };
@@ -24,12 +18,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		423BFC4823015F6F00CD4856 /* Path+Length.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+Length.swift"; sourceTree = "<group>"; };
-		423BFC4923015F6F00CD4856 /* Array+VectorArithmetic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+VectorArithmetic.swift"; sourceTree = "<group>"; };
-		423BFC4A23015F6F00CD4856 /* InterpolatedShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterpolatedShape.swift; sourceTree = "<group>"; };
-		423BFC4B23015F6F00CD4856 /* AnimatableDataSimilarShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimatableDataSimilarShape.swift; sourceTree = "<group>"; };
-		423BFC4C23015F6F00CD4856 /* Path+VectorArithmetic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Path+VectorArithmetic.swift"; sourceTree = "<group>"; };
-		423BFC4D23015F6F00CD4856 /* SimilarShape.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimilarShape.swift; sourceTree = "<group>"; };
 		423BFC562301BE0000CD4856 /* LiquidSwipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidSwipeView.swift; sourceTree = "<group>"; };
 		4266D0D5230EA92900001C42 /* LiquidSwipeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidSwipeSettings.swift; sourceTree = "<group>"; };
 		42D8919E22FC618D004105D9 /* LiquidSwipeSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiquidSwipeSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -53,19 +41,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		423BFC4723015F6F00CD4856 /* SwiftUIPathAnimations */ = {
-			isa = PBXGroup;
-			children = (
-				423BFC4823015F6F00CD4856 /* Path+Length.swift */,
-				423BFC4923015F6F00CD4856 /* Array+VectorArithmetic.swift */,
-				423BFC4A23015F6F00CD4856 /* InterpolatedShape.swift */,
-				423BFC4B23015F6F00CD4856 /* AnimatableDataSimilarShape.swift */,
-				423BFC4C23015F6F00CD4856 /* Path+VectorArithmetic.swift */,
-				423BFC4D23015F6F00CD4856 /* SimilarShape.swift */,
-			);
-			path = SwiftUIPathAnimations;
-			sourceTree = "<group>";
-		};
 		42D8919522FC618D004105D9 = {
 			isa = PBXGroup;
 			children = (
@@ -86,7 +61,6 @@
 			isa = PBXGroup;
 			children = (
 				42D891A122FC618D004105D9 /* AppDelegate.swift */,
-				423BFC4723015F6F00CD4856 /* SwiftUIPathAnimations */,
 				42D891A322FC618D004105D9 /* SceneDelegate.swift */,
 				42D891A522FC618D004105D9 /* ContentView.swift */,
 				4266D0D5230EA92900001C42 /* LiquidSwipeSettings.swift */,
@@ -181,13 +155,7 @@
 				42D891A222FC618D004105D9 /* AppDelegate.swift in Sources */,
 				423BFC572301BE0000CD4856 /* LiquidSwipeView.swift in Sources */,
 				42D891A422FC618D004105D9 /* SceneDelegate.swift in Sources */,
-				423BFC4E23015F6F00CD4856 /* Path+Length.swift in Sources */,
-				423BFC5223015F6F00CD4856 /* Path+VectorArithmetic.swift in Sources */,
 				4266D0D6230EA92900001C42 /* LiquidSwipeSettings.swift in Sources */,
-				423BFC5323015F6F00CD4856 /* SimilarShape.swift in Sources */,
-				423BFC4F23015F6F00CD4856 /* Array+VectorArithmetic.swift in Sources */,
-				423BFC5023015F6F00CD4856 /* InterpolatedShape.swift in Sources */,
-				423BFC5123015F6F00CD4856 /* AnimatableDataSimilarShape.swift in Sources */,
 				42D891A622FC618D004105D9 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
