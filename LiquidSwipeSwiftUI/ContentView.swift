@@ -12,13 +12,13 @@ struct ContentView: View {
     
     @State var backColor: Color = LiquidSwipeSettings.shared.nextColor
     
-    @State var leftWaveZIndex: Double = 1
+    @State var topWave = WaveAlignment.right
+  
     @State var leftDraggingPoint: CGPoint = CGPoint(x: 0.01, y: 100)
     @State var leftDraggingPointAdjusted: CGPoint = CGPoint(x: circleRadius + 4, y: 100)
     @State var leftDraggingOpacity: Double = 1
     @State var leftColor: Color = LiquidSwipeSettings.shared.nextColor
     
-    @State var rightWaveZIndex: Double = 4
     @State var rightDraggingPoint: CGPoint = CGPoint(x: 0.01, y: 300)
     @State var rightDraggingPointAdjusted: CGPoint = CGPoint(x: sizeW - circleRadius - 4, y: 300)
     @State var rightDraggingOpacity: Double = 1
@@ -28,23 +28,22 @@ struct ContentView: View {
         ZStack {
             Rectangle().foregroundColor(backColor)
             
-            leftWave().zIndex(leftWaveZIndex)
-            leftDragAreaIcon().zIndex(leftWaveZIndex + 1)
+            leftWave().zIndex(topWave == WaveAlignment.left ? 3 : 1)
+            leftDragAreaIcon().zIndex(topWave == WaveAlignment.left ? 4 : 2)
             
-            rightWave().zIndex(rightWaveZIndex)
-            rightDragAreaIcon().zIndex(rightWaveZIndex + 1)
+            rightWave().zIndex(topWave == WaveAlignment.left ? 1 : 3)
+            rightDragAreaIcon().zIndex(topWave == WaveAlignment.left ? 2 : 4)
         }
     }
     
     func leftWave() -> some View {
-        let wave = WaveView(draggingPoint: leftDraggingPoint, alignment: .left)
+        let wave = WaveView(draggingPoint: leftDraggingPoint, alignment: WaveAlignment.left)
         
         return wave
             .foregroundColor(leftColor)
             .gesture(DragGesture()
                 .onChanged { result in
-                    self.leftWaveZIndex = 4
-                    self.rightWaveZIndex = 1
+                    self.topWave = WaveAlignment.left
                     
                     self.leftDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .left, isDragging: true)
                     
@@ -64,12 +63,11 @@ struct ContentView: View {
     }
     
     func rightWave() -> some View {
-        return WaveView(draggingPoint: rightDraggingPoint, alignment: .right)
+        return WaveView(draggingPoint: rightDraggingPoint, alignment: WaveAlignment.right)
         .foregroundColor(rightColor)
             .gesture(DragGesture()
                 .onChanged { result in
-                    self.leftWaveZIndex = 1
-                    self.rightWaveZIndex = 4
+                    self.topWave = WaveAlignment.right
 
                     self.rightDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .right, isDragging: true)
 
@@ -89,12 +87,12 @@ struct ContentView: View {
     }
     
     func rightDragAreaIcon() -> some View {
-        return DragAreaIcon(draggingPoint: rightDraggingPointAdjusted, alignment: .right)
+        return DragAreaIcon(draggingPoint: rightDraggingPointAdjusted, alignment: WaveAlignment.right)
             .opacity(rightDraggingOpacity)
     }
     
     func leftDragAreaIcon() -> some View {
-        return DragAreaIcon(draggingPoint: leftDraggingPointAdjusted, alignment: .left)
+        return DragAreaIcon(draggingPoint: leftDraggingPointAdjusted, alignment: WaveAlignment.left)
             .opacity(leftDraggingOpacity)
     }
     
