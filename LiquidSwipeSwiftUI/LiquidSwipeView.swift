@@ -143,3 +143,28 @@ struct WaveView: Shape {
         0.31874, 1.57142, 0.23320, 1.62041, 0.15411, 1.68740,
         0.05099, 1.77475,       0, 1.87092,       0,       2]
 }
+
+struct DragAreaIcon: View {
+    var body: some View {
+        let w = Length(circleRadius * 2.0)
+        let color = Color(hex: 0x000000, alpha: 0.2)
+        
+        let circle = Circle()
+            .stroke(color)
+            .frame(width: w, height: w)
+        
+        let arrow =  Rectangle()
+            .trim(from: 1/2, to: 1)
+            .stroke(Color.white, lineWidth: 2)
+            .frame(width: 10, height: 10)
+            .rotationEffect(Angle(degrees: -135))
+        
+        return ZStack {
+            circle
+            arrow
+        }
+    }
+}
+
+
+

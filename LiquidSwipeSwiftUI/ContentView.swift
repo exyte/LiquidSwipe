@@ -29,12 +29,10 @@ struct ContentView: View {
             Rectangle().foregroundColor(backColor)
             
             leftWave().zIndex(leftWaveZIndex)
-            leftDragIcon().zIndex(leftWaveZIndex + 1)
-            leftArrow().zIndex(leftWaveZIndex + 2)
+            leftDragAreaIcon().zIndex(leftWaveZIndex + 1)
             
             rightWave().zIndex(rightWaveZIndex)
-            rightDragIcon().zIndex(rightWaveZIndex + 1)
-            rightArrow().zIndex(rightWaveZIndex + 2)
+            rightDragAreaIcon().zIndex(rightWaveZIndex + 1)
         }
     }
     
@@ -90,46 +88,16 @@ struct ContentView: View {
             })
     }
     
-    func rightDragIcon() -> some View {
-        let w = Length(circleRadius * 2.0)
-        let color = Color(hex: 0x000000, alpha: 0.2)
-
-        return Circle()
-            .stroke(color)
-            .frame(width: w, height: w)
+    func rightDragAreaIcon() -> some View {
+        return DragAreaIcon()
             .position(rightDraggingPointAdjusted)
             .opacity(rightDraggingOpacity)
     }
     
-    func leftDragIcon() -> some View {
-        let w = Length(circleRadius * 2.0)
-        let color = Color(hex: 0x000000, alpha: 0.2)
-        
-        return Circle()
-            .stroke(color)
-            .frame(width: w, height: w)
+    func leftDragAreaIcon() -> some View {
+        return DragAreaIcon()
             .position(leftDraggingPointAdjusted)
             .opacity(leftDraggingOpacity)
-    }
-    
-    func leftArrow() -> some View {
-        return Rectangle()
-            .trim(from: 1/2, to: 1)
-            .stroke(Color.white, lineWidth: 2)
-            .frame(width: 10, height: 10)
-            .rotationEffect(Angle(degrees: -135))
-            .position(leftDraggingPointAdjusted)
-            .opacity(leftDraggingOpacity)
-    }
-    
-    func rightArrow() -> some View {
-        return Rectangle()
-            .trim(from: 1/2, to: 1)
-            .stroke(Color.white, lineWidth: 2)
-            .frame(width: 10, height: 10)
-            .rotationEffect(Angle(degrees: 45))
-            .position(rightDraggingPointAdjusted)
-            .opacity(rightDraggingOpacity)
     }
     
     private func reload(actionWaveAlignment: WaveAlignment, dx: CGFloat) {
