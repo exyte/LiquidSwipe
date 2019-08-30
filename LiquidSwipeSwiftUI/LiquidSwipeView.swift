@@ -140,23 +140,31 @@ struct WaveView: Shape {
 }
 
 struct DragAreaIcon: View {
+
+    var draggingPoint: CGPoint
+    let alignment: WaveAlignment
+    
     var body: some View {
-        let w = Length(circleRadius * 2.0)
-        let color = Color(hex: 0x000000, alpha: 0.2)
         
-        let circle = Circle()
-            .stroke(color)
-            .frame(width: w, height: w)
+        let x0 = alignment == .left ? draggingPoint.x - 2 : draggingPoint.x + 2
+        let x1 = alignment == .left ? draggingPoint.x + 2 : draggingPoint.x - 2
         
-        let arrow =  Rectangle()
-            .trim(from: 1/2, to: 1)
-            .stroke(Color.white, lineWidth: 2)
-            .frame(width: 10, height: 10)
-            .rotationEffect(Angle(degrees: -135))
+        let arrow = Path { path in
+            path.move(to: CGPoint(x: x0, y: draggingPoint.y - 5))
+            path.addLine(to: CGPoint(x: x1, y: draggingPoint.y))
+            path.addLine(to: CGPoint(x: x0, y: draggingPoint.y + 5))
+        }
+            
+        let circle = Path { path in
+            path.addEllipse(in: CGRect(x: draggingPoint.x - circleRadius,
+                                       y: draggingPoint.y - circleRadius,
+                                       width: circleRadius * 2.0,
+                                       height: circleRadius * 2.0))
+        }
         
         return ZStack {
-            circle
-            arrow
+            circle.stroke(Color(hex: 0x000000, alpha: 0.2))
+            arrow.stroke(Color.white, lineWidth: 2)
         }
     }
 }

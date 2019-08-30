@@ -9,7 +9,7 @@
 import SwiftUI
 
 let pad: CGFloat = 16.0
-let circleRadius: CGFloat = 25.0
+let circleRadius: CGFloat = 24.0
 
 let sizeW: CGFloat = UIScreen.main.bounds.size.width
 let sizeH: CGFloat = UIScreen.main.bounds.size.height

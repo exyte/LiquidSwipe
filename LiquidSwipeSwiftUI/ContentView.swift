@@ -89,14 +89,12 @@ struct ContentView: View {
     }
     
     func rightDragAreaIcon() -> some View {
-        return DragAreaIcon()
-            .position(rightDraggingPointAdjusted)
+        return DragAreaIcon(draggingPoint: rightDraggingPointAdjusted, alignment: .right)
             .opacity(rightDraggingOpacity)
     }
     
     func leftDragAreaIcon() -> some View {
-        return DragAreaIcon()
-            .position(leftDraggingPointAdjusted)
+        return DragAreaIcon(draggingPoint: leftDraggingPointAdjusted, alignment: .left)
             .opacity(leftDraggingOpacity)
     }
     
