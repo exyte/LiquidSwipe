@@ -29,11 +29,11 @@ struct ContentView: View {
             Rectangle().foregroundColor(backColor)
             
             leftWave().zIndex(leftWaveZIndex)
-            leftCircle().zIndex(leftWaveZIndex + 1)
+            leftDragIcon().zIndex(leftWaveZIndex + 1)
             leftArrow().zIndex(leftWaveZIndex + 2)
             
             rightWave().zIndex(rightWaveZIndex)
-            rightCircle().zIndex(rightWaveZIndex + 1)
+            rightDragIcon().zIndex(rightWaveZIndex + 1)
             rightArrow().zIndex(rightWaveZIndex + 2)
         }
     }
@@ -90,7 +90,7 @@ struct ContentView: View {
             })
     }
     
-    func rightCircle() -> some View {
+    func rightDragIcon() -> some View {
         let w = Length(circleRadius * 2.0)
         let color = Color(hex: 0x000000, alpha: 0.2)
 
@@ -101,7 +101,7 @@ struct ContentView: View {
             .opacity(rightDraggingOpacity)
     }
     
-    func leftCircle() -> some View {
+    func leftDragIcon() -> some View {
         let w = Length(circleRadius * 2.0)
         let color = Color(hex: 0x000000, alpha: 0.2)
         
