@@ -13,11 +13,6 @@ enum WaveAlignment {
     case right
 }
 
-struct DragPointData: Equatable {
-    var point: CGPoint
-    var translation: CGSize
-}
-
 struct WaveView: Shape {
     
     var animatableData: AnimatablePair<CGFloat, CGFloat> {
