@@ -23,17 +23,28 @@ struct ContentView: View {
     @State var rightDraggingPointAdjusted: CGPoint = CGPoint(x: sizeW - circleRadius - 4, y: 300)
     @State var rightDraggingOpacity: Double = 1
     @State var rightColor: Color = LiquidSwipeSettings.shared.nextColor
+
+    @State var wavesOffset: CGFloat = 0
     
     var body: some View {
         ZStack {
             Rectangle().foregroundColor(backColor)
-            
-            leftWave().zIndex(topWave == WaveAlignment.left ? 3 : 1)
-            leftDragAreaIcon().zIndex(topWave == WaveAlignment.left ? 4 : 2)
-            
-            rightWave().zIndex(topWave == WaveAlignment.left ? 1 : 3)
-            rightDragAreaIcon().zIndex(topWave == WaveAlignment.left ? 2 : 4)
+
+            ZStack {
+                leftWave()
+                leftDragAreaIcon()
+            }
+            .zIndex(topWave == WaveAlignment.left ? 1 : 0)
+            .offset(x: -wavesOffset)
+
+            ZStack {
+                rightWave()
+                rightDragAreaIcon()
+            }
+            .zIndex(topWave == WaveAlignment.left ? 0 : 1)
+            .offset(x: wavesOffset)
         }
+        .edgesIgnoringSafeArea(.vertical)
     }
     
     func leftWave() -> some View {
@@ -137,9 +148,12 @@ struct ContentView: View {
                 self.leftDraggingPointAdjusted = CGPoint(x: circleRadius + 4, y: 100)
                 self.rightDraggingPointAdjusted = CGPoint(x: sizeW - circleRadius - 4, y: 300)
 
+                self.wavesOffset = 100
+
                 withAnimation(.spring()) {
                     self.leftDraggingOpacity = 1.0
                     self.rightDraggingOpacity = 1.0
+                    self.wavesOffset = 0
                 }
             }
         } else {
@@ -159,7 +173,7 @@ struct ContentView: View {
         
         if !isDragging {
             let success = progress > 0.15
-            progress = WaveView.self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
+            progress = WaveView.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
         }
         
         return CGPoint(x: progress, y: location.y)
