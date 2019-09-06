@@ -38,52 +38,74 @@ struct ContentView: View {
     
     func leftWave() -> some View {
         let wave = WaveView(draggingPoint: leftDraggingPoint, alignment: WaveAlignment.left)
+
+        let dragGesture = DragGesture()
+            .onChanged { result in
+                self.topWave = WaveAlignment.left
+
+                self.leftDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .left, isDragging: true)
+
+                let data = WaveView.adjustedDragPoint(point: CGPoint(x: result.translation.width, y: result.location.y), alignment: .left)
+
+                self.leftDraggingPointAdjusted = data.0
+                self.leftDraggingOpacity = data.1
+        }
+        .onEnded { result in
+            withAnimation(Animation.spring()) {
+                self.leftDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .left, isDragging: false)
+
+                self.leftDraggingOpacity = 0
+            }
+            self.reload(actionWaveAlignment: .left, dx: result.translation.width)
+        }
+
+        let tapGesture = TapGesture().onEnded { result in
+            withAnimation(Animation.spring()) {
+                self.leftDraggingPoint = CGPoint(x: 1, y: 0)
+                self.leftDraggingOpacity = 0
+            }
+            self.reload(actionWaveAlignment: .left, dx: 1000)
+        }
         
         return wave
             .foregroundColor(leftColor)
-            .gesture(DragGesture()
-                .onChanged { result in
-                    self.topWave = WaveAlignment.left
-                    
-                    self.leftDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .left, isDragging: true)
-                    
-                    let data = WaveView.adjustedDragPoint(point: CGPoint(x: result.translation.width, y: result.location.y), alignment: .left)
-                    
-                    self.leftDraggingPointAdjusted = data.0
-                    self.leftDraggingOpacity = data.1
-            }
-            .onEnded { result in
-                withAnimation(Animation.spring()) {
-                    self.leftDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .left, isDragging: false)
-                    
-                    self.leftDraggingOpacity = 0
-                }
-                self.reload(actionWaveAlignment: .left, dx: result.translation.width)
-            })
+            .gesture(dragGesture.simultaneously(with: tapGesture))
     }
     
     func rightWave() -> some View {
-        return WaveView(draggingPoint: rightDraggingPoint, alignment: WaveAlignment.right)
-        .foregroundColor(rightColor)
-            .gesture(DragGesture()
-                .onChanged { result in
-                    self.topWave = WaveAlignment.right
+        let wave = WaveView(draggingPoint: rightDraggingPoint, alignment: WaveAlignment.right)
 
-                    self.rightDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .right, isDragging: true)
+        let dragGesture = DragGesture()
+            .onChanged { result in
+                self.topWave = WaveAlignment.right
 
-                    let data = WaveView.adjustedDragPoint(point: CGPoint(x: result.translation.width, y: result.location.y), alignment: .right)
+                self.rightDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .right, isDragging: true)
 
-                    self.rightDraggingPointAdjusted = data.0
-                    self.rightDraggingOpacity = data.1
+                let data = WaveView.adjustedDragPoint(point: CGPoint(x: result.translation.width, y: result.location.y), alignment: .right)
+
+                self.rightDraggingPointAdjusted = data.0
+                self.rightDraggingOpacity = data.1
+        }
+        .onEnded { result in
+            withAnimation(.spring()) {
+                self.rightDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .right, isDragging: false)
+
+                self.rightDraggingOpacity = 0
             }
-            .onEnded { result in
-                withAnimation(.spring()) {
-                    self.rightDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .right, isDragging: false)
-                    
-                    self.rightDraggingOpacity = 0
-                }
-                self.reload(actionWaveAlignment: .right, dx: -result.translation.width)
-            })
+            self.reload(actionWaveAlignment: .right, dx: -result.translation.width)
+        }
+
+        let tapGesture = TapGesture().onEnded { result in
+            withAnimation(Animation.spring()) {
+                self.rightDraggingPoint = CGPoint(x: 1, y: 0)
+                self.rightDraggingOpacity = 0
+            }
+            self.reload(actionWaveAlignment: .right, dx: 1000)
+        }
+
+        return wave
+            .foregroundColor(rightColor)
+            .gesture(dragGesture.simultaneously(with: tapGesture))
     }
     
     func rightDragAreaIcon() -> some View {
