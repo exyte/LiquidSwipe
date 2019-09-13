@@ -9,26 +9,27 @@
 import SwiftUI
 
 struct ContentView: View {
-    
-    @State var backColor: Color = LiquidSwipeSettings.shared.nextColor
-    
+
     @State var topWave = WaveAlignment.right
-  
+    @State var pageIndex = 0
+
     @State var leftDraggingPoint: CGPoint = CGPoint(x: 0.01, y: 100)
     @State var leftDraggingPointAdjusted: CGPoint = CGPoint(x: circleRadius + 4, y: 100)
     @State var leftDraggingOpacity: Double = 1
-    @State var leftColor: Color = LiquidSwipeSettings.shared.nextColor
-    
+
     @State var rightDraggingPoint: CGPoint = CGPoint(x: 0.01, y: 300)
     @State var rightDraggingPointAdjusted: CGPoint = CGPoint(x: sizeW - circleRadius - 4, y: 300)
     @State var rightDraggingOpacity: Double = 1
-    @State var rightColor: Color = LiquidSwipeSettings.shared.nextColor
 
     @State var wavesOffset: CGFloat = 0
-    
+
+    let colors = [0x0074D9, 0x7FDBFF, 0x39CCCC, 0x3D9970, 0x2ECC40, 0x01FF70,
+                  0xFFDC00, 0xFF851B, 0xFF4136, 0xF012BE, 0xB10DC9, 0xAAAAAA]
+                 .shuffled().map { val in Color(hex: val) }
+
     var body: some View {
         ZStack {
-            Rectangle().foregroundColor(backColor)
+            Rectangle().foregroundColor(colors[pageIndex])
 
             ZStack {
                 leftWave()
@@ -77,9 +78,9 @@ struct ContentView: View {
             }
             self.reload(actionWaveAlignment: .left, dx: 1000)
         }
-        
+
         return wave
-            .foregroundColor(leftColor)
+            .foregroundColor(colors[prevIndex()])
             .gesture(dragGesture.simultaneously(with: tapGesture))
     }
     
@@ -115,7 +116,7 @@ struct ContentView: View {
         }
 
         return wave
-            .foregroundColor(rightColor)
+            .foregroundColor(colors[nextIndex()])
             .gesture(dragGesture.simultaneously(with: tapGesture))
     }
     
@@ -134,12 +135,7 @@ struct ContentView: View {
 
         if progress > 0.15 {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                let waveColor = actionWaveAlignment == .left ? self.leftColor : self.rightColor
-
-                self.backColor = waveColor
-
-                self.leftColor = LiquidSwipeSettings.shared.nextColor
-                self.rightColor = LiquidSwipeSettings.shared.nextColor
+                self.pageIndex = actionWaveAlignment == .left ? self.prevIndex() : self.nextIndex()
 
                 self.leftDraggingPoint = self.calculatePoint(location: CGPoint(x: 0, y: 100), translation: CGSize(width: pad, height: 0), alignment: .left, isDragging: false)
      
@@ -178,6 +174,15 @@ struct ContentView: View {
         
         return CGPoint(x: progress, y: location.y)
     }
+
+    private func nextIndex() -> Int {
+        return pageIndex == colors.count - 1 ? 0 : pageIndex + 1
+    }
+
+    private func prevIndex() -> Int {
+        return pageIndex == 0 ? colors.count - 1 : pageIndex - 1
+    }
+
 }
 
 

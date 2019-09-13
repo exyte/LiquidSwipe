@@ -161,9 +161,8 @@ struct DragAreaIcon: View {
                                        width: circleRadius * 2.0,
                                        height: circleRadius * 2.0))
         }
-        
         return ZStack {
-            circle.stroke(Color(hex: 0x000000, alpha: 0.2))
+            circle.stroke().opacity(0.2)
             arrow.stroke(Color.white, lineWidth: 2)
         }
     }
