@@ -20,7 +20,7 @@
 /* Begin PBXFileReference section */
 		423BFC562301BE0000CD4856 /* LiquidSwipeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidSwipeView.swift; sourceTree = "<group>"; };
 		4266D0D5230EA92900001C42 /* LiquidSwipeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidSwipeSettings.swift; sourceTree = "<group>"; };
-		42D8919E22FC618D004105D9 /* LiquidSwipeSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiquidSwipeSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		42D8919E22FC618D004105D9 /* LiquidSwipe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiquidSwipe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		42D891A122FC618D004105D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		42D891A322FC618D004105D9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		42D891A522FC618D004105D9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -44,7 +44,7 @@
 		42D8919522FC618D004105D9 = {
 			isa = PBXGroup;
 			children = (
-				42D891A022FC618D004105D9 /* LiquidSwipeSwiftUI */,
+				42D891A022FC618D004105D9 /* LiquidSwipe */,
 				42D8919F22FC618D004105D9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -52,12 +52,12 @@
 		42D8919F22FC618D004105D9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				42D8919E22FC618D004105D9 /* LiquidSwipeSwiftUI.app */,
+				42D8919E22FC618D004105D9 /* LiquidSwipe.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		42D891A022FC618D004105D9 /* LiquidSwipeSwiftUI */ = {
+		42D891A022FC618D004105D9 /* LiquidSwipe */ = {
 			isa = PBXGroup;
 			children = (
 				42D891A122FC618D004105D9 /* AppDelegate.swift */,
@@ -70,7 +70,7 @@
 				42D891AF22FC618E004105D9 /* Info.plist */,
 				42D891A922FC618E004105D9 /* Preview Content */,
 			);
-			path = LiquidSwipeSwiftUI;
+			path = LiquidSwipe;
 			sourceTree = "<group>";
 		};
 		42D891A922FC618E004105D9 /* Preview Content */ = {
@@ -84,9 +84,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		42D8919D22FC618D004105D9 /* LiquidSwipeSwiftUI */ = {
+		42D8919D22FC618D004105D9 /* LiquidSwipe */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 42D891B222FC618E004105D9 /* Build configuration list for PBXNativeTarget "LiquidSwipeSwiftUI" */;
+			buildConfigurationList = 42D891B222FC618E004105D9 /* Build configuration list for PBXNativeTarget "LiquidSwipe" */;
 			buildPhases = (
 				42D8919A22FC618D004105D9 /* Sources */,
 				42D8919B22FC618D004105D9 /* Frameworks */,
@@ -96,9 +96,9 @@
 			);
 			dependencies = (
 			);
-			name = LiquidSwipeSwiftUI;
+			name = LiquidSwipe;
 			productName = LiquidSwipeSwiftUI;
-			productReference = 42D8919E22FC618D004105D9 /* LiquidSwipeSwiftUI.app */;
+			productReference = 42D8919E22FC618D004105D9 /* LiquidSwipe.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -116,7 +116,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 42D8919922FC618D004105D9 /* Build configuration list for PBXProject "LiquidSwipeSwiftUI" */;
+			buildConfigurationList = 42D8919922FC618D004105D9 /* Build configuration list for PBXProject "LiquidSwipe" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -129,7 +129,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				42D8919D22FC618D004105D9 /* LiquidSwipeSwiftUI */,
+				42D8919D22FC618D004105D9 /* LiquidSwipe */,
 			);
 		};
 /* End PBXProject section */
@@ -293,15 +293,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "LiquidSwipeSwiftUI/Preview\\ Content";
+				DEVELOPMENT_ASSET_PATHS = "LiquidSwipe/Preview\\ Content";
 				DEVELOPMENT_TEAM = YG997YPASH;
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = LiquidSwipeSwiftUI/Info.plist;
+				INFOPLIST_FILE = LiquidSwipe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = Exyte.LiquidSwipeSwiftUI;
+				PRODUCT_BUNDLE_IDENTIFIER = exyte.LiquidSwipe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -313,15 +313,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "LiquidSwipeSwiftUI/Preview\\ Content";
+				DEVELOPMENT_ASSET_PATHS = "LiquidSwipe/Preview\\ Content";
 				DEVELOPMENT_TEAM = YG997YPASH;
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = LiquidSwipeSwiftUI/Info.plist;
+				INFOPLIST_FILE = LiquidSwipe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = Exyte.LiquidSwipeSwiftUI;
+				PRODUCT_BUNDLE_IDENTIFIER = exyte.LiquidSwipe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -331,7 +331,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		42D8919922FC618D004105D9 /* Build configuration list for PBXProject "LiquidSwipeSwiftUI" */ = {
+		42D8919922FC618D004105D9 /* Build configuration list for PBXProject "LiquidSwipe" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				42D891B022FC618E004105D9 /* Debug */,
@@ -340,7 +340,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		42D891B222FC618E004105D9 /* Build configuration list for PBXNativeTarget "LiquidSwipeSwiftUI" */ = {
+		42D891B222FC618E004105D9 /* Build configuration list for PBXNativeTarget "LiquidSwipe" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				42D891B322FC618E004105D9 /* Debug */,
