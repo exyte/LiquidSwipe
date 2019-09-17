@@ -54,9 +54,10 @@ struct WaveView: Shape {
         let sign: CGFloat = alignment == .left ? 1.0 : -1.0
 
         var path = Path()
+        let x = alignment == .left ? -50 : WaveView.bounds.width + 50
         path.move(to: CGPoint(x: xSide, y: -100))
-        path.addLine(to: CGPoint(x: alignment == .left ? 0 : WaveView.bounds.width, y: -100))
-        path.addLine(to: CGPoint(x: alignment == .left ? 0 : WaveView.bounds.width, y: WaveView.bounds.height))
+        path.addLine(to: CGPoint(x: x, y: -100))
+        path.addLine(to: CGPoint(x: x, y: WaveView.bounds.height))
         path.addLine(to: CGPoint(x: xSide, y: WaveView.bounds.height))
         path.addLine(to: CGPoint(x: xSide, y: curveStartY))
 
