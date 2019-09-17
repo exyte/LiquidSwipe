@@ -1,172 +1,198 @@
 //
-//  LiquidSwipeView.swift
+//  ContentView.swift
 //  LiquidSwipeSwiftUI
 //
-//  Created by Mark Goldin on 12/08/2019.
+//  Created by Mark Goldin on 08/08/2019.
 //  Copyright © 2019 Exyte. All rights reserved.
 //
 
 import SwiftUI
 
-enum WaveAlignment {
-    case left
-    case right
-}
+struct LiquidSwipeView: View {
 
-struct WaveView: Shape {
-    
-    var animatableData: AnimatablePair<CGFloat, CGFloat> {
-        get { AnimatablePair(draggingPoint.x, draggingPoint.y) }
-        set {
-            draggingPoint.x = newValue.first
-            draggingPoint.y = newValue.second
-        }
-    }
-    
-    var draggingPoint: CGPoint
-    let alignment: WaveAlignment
-    
-    init(draggingPoint: CGPoint, alignment: WaveAlignment) {
-        self.draggingPoint = draggingPoint
-        self.alignment = alignment
-    }
-    
-    func path(in rect: CGRect) -> Path {
-        return build(cy: draggingPoint.y, progress: draggingPoint.x)
-    }
-    
-    private func build(cy: CGFloat, progress: CGFloat) -> Path {
-        let side = WaveView.adjust(from: 15, to: sizeW, p: progress, min: 0.2, max: 0.8)
-        let hr = WaveView.getHr(from: 48, to: sizeW * 0.8, p: progress)
-        let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: progress, max: 0.4)
-        let opacity = max(1 - progress * 5, 0)
-        return build(cy: cy, hr: hr, vr: vr, side: side, opacity: opacity)
-    }
-    
-    private func build(cy: CGFloat, hr: CGFloat, vr: CGFloat, side: CGFloat, opacity: CGFloat) -> Path {
-        let xSide = alignment == .left ? side : sizeW - side
-        let curveStartY = vr + cy
-        let sign: CGFloat = alignment == .left ? 1.0 : -1.0
-        
-        var path = Path()
-        path.move(to: CGPoint(x: xSide, y: -100))
-        path.addLine(to: CGPoint(x: alignment == .left ? 0 : sizeW, y: -100))
-        path.addLine(to: CGPoint(x: alignment == .left ? 0 : sizeW, y: sizeH))
-        path.addLine(to: CGPoint(x: xSide, y: sizeH))
-        path.addLine(to: CGPoint(x: xSide, y: curveStartY))
-    
-        var index = 0
-        while index < WaveView.data.count {
-            let x1 = xSide + sign * hr * WaveView.data[index]
-            let y1 = curveStartY - vr * WaveView.data[index + 1]
-            let x2 = xSide + sign * hr * WaveView.data[index + 2]
-            let y2 = curveStartY - vr * WaveView.data[index + 3]
-            let x = xSide + sign * hr * WaveView.data[index + 4]
-            let y = curveStartY - vr * WaveView.data[index + 5]
+    @State var topWave = WaveSide.right
+    @State var pageIndex = 0
 
-            let point = CGPoint(x: x, y: y)
-            let control1 = CGPoint(x: x1, y: y1)
-            let control2 = CGPoint(x: x2, y: y2)
+    @State var leftDraggingPoint: CGPoint = CGPoint(x: 0.01, y: 100)
+    @State var leftDraggingPointAdjusted: CGPoint = CGPoint(x: DragAreaIcon.radius + 4, y: 100)
+    @State var leftDraggingOpacity: Double = 1
 
-            path.addCurve(to: point, control1: control1, control2: control2)
+    @State var rightDraggingPoint: CGPoint = CGPoint(x: 0.01, y: 300)
+    @State var rightDraggingPointAdjusted: CGPoint = CGPoint(x: WaveView.bounds.width - DragAreaIcon.radius - 4, y: 300)
+    @State var rightDraggingOpacity: Double = 1
 
-            index += 6
-        }
-     
-        return path
-    }
-    
-    static func getProgress(dx: CGFloat) -> CGFloat {
-        return min(1.0, max(0, dx * 0.45 / UIScreen.main.bounds.size.width))
-    }
-    
-    static func getHr(from: CGFloat, to: CGFloat, p: CGFloat) -> CGFloat {
-        let p1: CGFloat = 0.4
-        if p <= p1 {
-            return adjust(from: from, to: to, p: p, max: p1)
-        } else if p >= 1 {
-            return to
-        }
-        let t = (p - p1) / (1 - p1)
-        let m: CGFloat = 9.8
-        let beta: CGFloat = 40.0 / (2 * m)
-        let omega = pow(-pow(beta, 2) + pow(50.0 / m, 2), 0.5)
-        return to * exp(-beta * t) * cos(omega * t)
-    }
-    
-    static func adjust(from: CGFloat, to: CGFloat, p: CGFloat, min: CGFloat = 0, max: CGFloat = 1) -> CGFloat {
-        if p <= min {
-            return from
-        } else if p >= max {
-            return to
-        }
-        return from + (to - from) * (p - min) / (max - min)
-    }
-    
-    static func adjustedDragPoint(point: CGPoint, alignment: WaveAlignment) -> (CGPoint, Double) {
-        var dx = alignment == .left ? point.x : -point.x
-        let progress = WaveView.getProgress(dx: dx)
-        
-        //        if !isDragging {
-        //            let success = progress > 0.15
-        //            progress = WaveView.self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
-        //        }
-        
-        let side = WaveView.adjust(from: 15, to: sizeW, p: progress, min: 0.2, max: 0.8)
-        let hr = WaveView.getHr(from: 48, to: sizeW * 0.8, p: progress)
-      //  let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: progress, max: 0.4)
-        let opacity = max(1 - progress * 5, 0)
-        
-        let xSide = alignment == .left ? side : sizeW - side
-        let sign: CGFloat = alignment == .left ? 1.0 : -1.0
-        
-        dx = xSide + sign * hr
-        let dx2 = alignment == .left ? -circleRadius - 8 : circleRadius + 8
-        
-        return (CGPoint(x: dx + dx2, y: point.y), Double(opacity))
-    }
-    
-    private static let data: [CGFloat] = [
-        0, 0.13461, 0.05341, 0.24127, 0.15615, 0.33223,
-        0.23616, 0.40308, 0.33052, 0.45611, 0.50124, 0.53505,
-        0.51587, 0.54182, 0.56641, 0.56503, 0.57493, 0.56896,
-        0.72837, 0.63973, 0.80866, 0.68334, 0.87740, 0.73990,
-        0.96534, 0.81226,       1, 0.89361,       1,       1,
-        1, 1.10014, 0.95957, 1.18879, 0.86084, 1.27048,
-        0.78521, 1.33305, 0.70338, 1.37958, 0.52911, 1.46651,
-        0.52418, 1.46896, 0.50573, 1.47816, 0.50153, 1.48026,
-        0.31874, 1.57142, 0.23320, 1.62041, 0.15411, 1.68740,
-        0.05099, 1.77475,       0, 1.87092,       0,       2]
-}
+    @State var wavesOffset: CGFloat = 0
 
-struct DragAreaIcon: View {
+    let colors = [0x0074D9, 0x7FDBFF, 0x39CCCC, 0x3D9970, 0x2ECC40, 0x01FF70,
+                  0xFFDC00, 0xFF851B, 0xFF4136, 0xF012BE, 0xB10DC9, 0xAAAAAA]
+                 .shuffled().map { val in Color(hex: val) }
 
-    var draggingPoint: CGPoint
-    let alignment: WaveAlignment
-    
+    let pad: CGFloat = 16.0
+
     var body: some View {
-        
-        let x0 = alignment == .left ? draggingPoint.x - 2 : draggingPoint.x + 2
-        let x1 = alignment == .left ? draggingPoint.x + 2 : draggingPoint.x - 2
-        
-        let arrow = Path { path in
-            path.move(to: CGPoint(x: x0, y: draggingPoint.y - 5))
-            path.addLine(to: CGPoint(x: x1, y: draggingPoint.y))
-            path.addLine(to: CGPoint(x: x0, y: draggingPoint.y + 5))
+        ZStack {
+            Rectangle().foregroundColor(colors[pageIndex])
+
+            ZStack {
+                leftWave()
+                leftDragAreaIcon()
+            }
+            .zIndex(topWave == WaveSide.left ? 1 : 0)
+            .offset(x: -wavesOffset)
+
+            ZStack {
+                rightWave()
+                rightDragAreaIcon()
+            }
+            .zIndex(topWave == WaveSide.left ? 0 : 1)
+            .offset(x: wavesOffset)
         }
-            
-        let circle = Path { path in
-            path.addEllipse(in: CGRect(x: draggingPoint.x - circleRadius,
-                                       y: draggingPoint.y - circleRadius,
-                                       width: circleRadius * 2.0,
-                                       height: circleRadius * 2.0))
+        .edgesIgnoringSafeArea(.vertical)
+    }
+    
+    func leftWave() -> some View {
+        let wave = WaveView(draggingPoint: leftDraggingPoint, alignment: WaveSide.left)
+
+        let dragGesture = DragGesture()
+            .onChanged { result in
+                self.topWave = WaveSide.left
+
+                self.leftDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .left, isDragging: true)
+
+                let data = WaveView.adjustedDragPoint(point: CGPoint(x: result.translation.width, y: result.location.y), alignment: .left)
+
+                self.leftDraggingPointAdjusted = data.0
+                self.leftDraggingOpacity = data.1
         }
-        return ZStack {
-            circle.stroke().opacity(0.2)
-            arrow.stroke(Color.white, lineWidth: 2)
+        .onEnded { result in
+            withAnimation(Animation.spring()) {
+                self.leftDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .left, isDragging: false)
+
+                self.leftDraggingOpacity = 0
+            }
+            self.reload(actionWaveAlignment: .left, dx: result.translation.width)
+        }
+
+        let tapGesture = TapGesture().onEnded { result in
+            withAnimation(Animation.spring()) {
+                self.leftDraggingPoint = CGPoint(x: 1, y: 0)
+                self.leftDraggingOpacity = 0
+            }
+            self.reload(actionWaveAlignment: .left, dx: 1000)
+        }
+
+        return wave
+            .foregroundColor(colors[prevIndex()])
+            .gesture(dragGesture.simultaneously(with: tapGesture))
+    }
+    
+    func rightWave() -> some View {
+        let wave = WaveView(draggingPoint: rightDraggingPoint, alignment: WaveSide.right)
+
+        let dragGesture = DragGesture()
+            .onChanged { result in
+                self.topWave = WaveSide.right
+
+                self.rightDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .right, isDragging: true)
+
+                let data = WaveView.adjustedDragPoint(point: CGPoint(x: result.translation.width, y: result.location.y), alignment: .right)
+
+                self.rightDraggingPointAdjusted = data.0
+                self.rightDraggingOpacity = data.1
+        }
+        .onEnded { result in
+            withAnimation(.spring()) {
+                self.rightDraggingPoint = self.calculatePoint(location: result.location, translation: result.translation, alignment: .right, isDragging: false)
+
+                self.rightDraggingOpacity = 0
+            }
+            self.reload(actionWaveAlignment: .right, dx: -result.translation.width)
+        }
+
+        let tapGesture = TapGesture().onEnded { result in
+            withAnimation(Animation.spring()) {
+                self.rightDraggingPoint = CGPoint(x: 1, y: 0)
+                self.rightDraggingOpacity = 0
+            }
+            self.reload(actionWaveAlignment: .right, dx: 1000)
+        }
+
+        return wave
+            .foregroundColor(colors[nextIndex()])
+            .gesture(dragGesture.simultaneously(with: tapGesture))
+    }
+    
+    func rightDragAreaIcon() -> some View {
+        return DragAreaIcon(draggingPoint: rightDraggingPointAdjusted, alignment: WaveSide.right)
+            .opacity(rightDraggingOpacity)
+    }
+    
+    func leftDragAreaIcon() -> some View {
+        return DragAreaIcon(draggingPoint: leftDraggingPointAdjusted, alignment: WaveSide.left)
+            .opacity(leftDraggingOpacity)
+    }
+    
+    private func reload(actionWaveAlignment: WaveSide, dx: CGFloat) {
+        let progress = WaveView.getProgress(dx: dx)
+
+        if progress > 0.15 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.pageIndex = actionWaveAlignment == .left ? self.prevIndex() : self.nextIndex()
+
+                self.leftDraggingPoint = self.calculatePoint(location: CGPoint(x: 0, y: 100), translation: CGSize(width: self.pad, height: 0), alignment: .left, isDragging: false)
+     
+                self.rightDraggingPoint = self.calculatePoint(location: CGPoint(x: 0, y: 300), translation: CGSize(width: self.pad, height: 0), alignment: .left, isDragging: false)
+               
+                self.leftDraggingPointAdjusted = CGPoint(x: DragAreaIcon.radius + 4, y: 100)
+                self.rightDraggingPointAdjusted = CGPoint(x: WaveView.bounds.width - DragAreaIcon.radius - 4, y: 300)
+
+                self.wavesOffset = 100
+
+                withAnimation(.spring()) {
+                    self.leftDraggingOpacity = 1.0
+                    self.rightDraggingOpacity = 1.0
+                    self.wavesOffset = 0
+                }
+            }
+        } else {
+            withAnimation(.spring()) {
+                self.leftDraggingOpacity = 1.0
+                self.leftDraggingPointAdjusted = CGPoint(x: DragAreaIcon.radius + 4, y: leftDraggingPoint.y)
+
+                self.rightDraggingOpacity = 1.0
+                self.rightDraggingPointAdjusted = CGPoint(x: WaveView.bounds.width - DragAreaIcon.radius - 4, y: rightDraggingPoint.y)
+            }
         }
     }
+    
+    func calculatePoint(location: CGPoint, translation: CGSize, alignment: WaveSide, isDragging: Bool) -> CGPoint {
+        let dx = alignment == .left ? translation.width : -translation.width
+        var progress = WaveView.getProgress(dx: dx)
+        
+        if !isDragging {
+            let success = progress > 0.15
+            progress = WaveView.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
+        }
+        
+        return CGPoint(x: progress, y: location.y)
+    }
+
+    private func nextIndex() -> Int {
+        return pageIndex == colors.count - 1 ? 0 : pageIndex + 1
+    }
+
+    private func prevIndex() -> Int {
+        return pageIndex == 0 ? colors.count - 1 : pageIndex - 1
+    }
+
 }
 
-
-
+extension Color {
+    init(hex: Int) {
+        self.init(
+            red: Double((hex >> 16) & 0xff) / 255,
+            green: Double((hex >> 08) & 0xff) / 255,
+            blue: Double((hex >> 00) & 0xff) / 255
+        )
+    }
+}
