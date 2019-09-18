@@ -16,28 +16,25 @@ enum WaveSide {
 struct WaveView: Shape {
 
     internal var animatableData: AnimatablePair<CGFloat, CGFloat> {
-        get { AnimatablePair(draggingPoint.x, draggingPoint.y) }
+        get { AnimatablePair(dx, y) }
         set {
-            draggingPoint.x = newValue.first
-            draggingPoint.y = newValue.second
+            dx = newValue.first
+            y = newValue.second
         }
     }
-    
-    private var draggingPoint: CGPoint
-    private let alignment: WaveSide
+
+    private let side: WaveSide
+    private var dx: CGFloat
+    private var y: CGFloat
 
     init(data: WaveData) {
-        self.draggingPoint = data.draggingPoint
-        self.alignment = data.side
+        self.side = data.side
+        self.dx = data.draggingPoint.x
+        self.y = data.draggingPoint.y
     }
 
-    init(draggingPoint: CGPoint, alignment: WaveSide) {
-        self.draggingPoint = draggingPoint
-        self.alignment = alignment
-    }
-    
     func path(in rect: CGRect) -> Path {
-        return build(cy: draggingPoint.y, progress: draggingPoint.x)
+        return build(cy: y, progress: dx)
     }
     
     private func build(cy: CGFloat, progress: CGFloat) -> Path {
@@ -48,13 +45,31 @@ struct WaveView: Shape {
         return build(cy: cy, hr: hr, vr: vr, side: side, opacity: opacity)
     }
 
-    private func build(cy: CGFloat, hr: CGFloat, vr: CGFloat, side: CGFloat, opacity: CGFloat) -> Path {
-        let xSide = alignment == .left ? side : WaveView.bounds.width - side
-        let curveStartY = vr + cy
+    static func adjustedDragPoint(point: CGPoint, alignment: WaveSide) -> (CGPoint, Double) {
+        var dx = alignment == .left ? point.x : -point.x
+        let progress = WaveView.getProgress(dx: dx)
+        let side = WaveView.adjust(from: 15, to: bounds.width, p: progress, min: 0.2, max: 0.8)
+        let hr = WaveView.getHr(from: 48, to: bounds.width * 0.8, p: progress)
+        //  let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: progress, max: 0.4)
+        let opacity = max(1 - progress * 5, 0)
+        
+        let xSide = alignment == .left ? side : bounds.width - side
         let sign: CGFloat = alignment == .left ? 1.0 : -1.0
+        
+        dx = xSide + sign * hr
+        let dx2 = alignment == .left ? -SwipeButton.radius - 8 : SwipeButton.radius + 8
+        
+        return (CGPoint(x: dx + dx2, y: point.y), Double(opacity))
+    }
+
+    private func build(cy: CGFloat, hr: CGFloat, vr: CGFloat, side: CGFloat, opacity: CGFloat) -> Path {
+        let isLeft = self.side == .left
+        let xSide = isLeft ? side : WaveView.bounds.width - side
+        let curveStartY = vr + cy
+        let sign: CGFloat = isLeft ? 1.0 : -1.0
 
         var path = Path()
-        let x = alignment == .left ? -50 : WaveView.bounds.width + 50
+        let x = isLeft ? -50 : WaveView.bounds.width + 50
         path.move(to: CGPoint(x: xSide, y: -100))
         path.addLine(to: CGPoint(x: x, y: -100))
         path.addLine(to: CGPoint(x: x, y: WaveView.bounds.height))
@@ -107,29 +122,6 @@ struct WaveView: Shape {
             return to
         }
         return from + (to - from) * (p - min) / (max - min)
-    }
-    
-    static func adjustedDragPoint(point: CGPoint, alignment: WaveSide) -> (CGPoint, Double) {
-        var dx = alignment == .left ? point.x : -point.x
-        let progress = WaveView.getProgress(dx: dx)
-        
-        //        if !isDragging {
-        //            let success = progress > 0.15
-        //            progress = WaveView.self.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
-        //        }
-        
-        let side = WaveView.adjust(from: 15, to: bounds.width, p: progress, min: 0.2, max: 0.8)
-        let hr = WaveView.getHr(from: 48, to: bounds.width * 0.8, p: progress)
-      //  let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: progress, max: 0.4)
-        let opacity = max(1 - progress * 5, 0)
-        
-        let xSide = alignment == .left ? side : bounds.width - side
-        let sign: CGFloat = alignment == .left ? 1.0 : -1.0
-        
-        dx = xSide + sign * hr
-        let dx2 = alignment == .left ? -SwipeButton.radius - 8 : SwipeButton.radius + 8
-        
-        return (CGPoint(x: dx + dx2, y: point.y), Double(opacity))
     }
 
     static var bounds: CGRect {
@@ -187,10 +179,6 @@ struct WaveData {
         return WaveData(side: side, point: point, center: buttonCenter, opacity: 0)
     }
 
-    func button() -> some View {
-        return SwipeButton(side: side, center: buttonCenter).opacity(buttonOpacity)
-    }
-
     func calculatePoint(location: CGPoint, translation: CGSize, alignment: WaveSide, isDragging: Bool) -> CGPoint {
         let dx = alignment == .left ? translation.width : -translation.width
         var progress = WaveView.getProgress(dx: dx)
@@ -224,42 +212,10 @@ struct WaveData {
 
 }
 
-struct SwipeButton: View {
+struct SwipeButton {
 
     static let radius: CGFloat = 24.0
 
-    internal var animatableData: AnimatablePair<CGFloat, CGFloat> {
-        get { AnimatablePair(center.x, center.y) }
-        set {
-            center.x = newValue.first
-            center.y = newValue.second
-        }
-    }
-
-    let side: WaveSide
-    var center: CGPoint
-
-    var body: some View {
-        let x0 = side == .left ? center.x - 2 : center.x + 2
-        let x1 = side == .left ? center.x + 2 : center.x - 2
-        
-        let arrow = Path { path in
-            path.move(to: CGPoint(x: x0, y: center.y - 5))
-            path.addLine(to: CGPoint(x: x1, y: center.y))
-            path.addLine(to: CGPoint(x: x0, y: center.y + 5))
-        }
-        let r = SwipeButton.radius
-        let circle = Path { path in
-            path.addEllipse(in: CGRect(x: center.x - r,
-                                       y: center.y - r,
-                                       width: r * 2.0,
-                                       height: r * 2.0))
-        }
-        return ZStack {
-            circle.stroke().opacity(0.2)
-            arrow.stroke(Color.white, lineWidth: 2)
-        }
-    }
 }
 
 

@@ -26,15 +26,23 @@ struct LiquidSwipeView: View {
             Rectangle().foregroundColor(colors[pageIndex])
 
             ZStack {
-                leftWave()
-                leftDragAreaIcon()
+                wave(data: $leftWaveData)
+                    .foregroundColor(colors[prevIndex()])
+                button()
+                    .offset(x: leftWaveData.buttonCenter.x,
+                            y: leftWaveData.buttonCenter.y)
+                    .opacity(leftWaveData.buttonOpacity)
             }
             .zIndex(topWave == WaveSide.left ? 1 : 0)
             .offset(x: -wavesOffset)
 
             ZStack {
-                rightWave()
-                rightDragAreaIcon()
+                wave(data: $rightWaveData)
+                    .foregroundColor(colors[nextIndex()])
+                button()
+                    .offset(x: rightWaveData.buttonCenter.x,
+                            y: rightWaveData.buttonCenter.y)
+                    .opacity(rightWaveData.buttonOpacity)
             }
             .zIndex(topWave == WaveSide.left ? 0 : 1)
             .offset(x: wavesOffset)
@@ -42,90 +50,68 @@ struct LiquidSwipeView: View {
         .edgesIgnoringSafeArea(.vertical)
     }
 
-    func leftWave() -> some View {
-        let wave = WaveView(data: leftWaveData)
-
-        let dragGesture = DragGesture()
-            .onChanged { result in
-                self.topWave = WaveSide.left
-                self.leftWaveData = self.leftWaveData.dragChange(location: result.location, translation: result.translation)
-        }
-        .onEnded { result in
-            withAnimation(Animation.spring()) {
-                self.leftWaveData = self.leftWaveData.dragEnd(location: result.location, translation: result.translation)
+    func button() -> some View {
+        return ZStack {
+            Path { path in
+                path.addEllipse(in: CGRect(x: -SwipeButton.radius,
+                   y: -SwipeButton.radius,
+                   width: SwipeButton.radius * CGFloat(2),
+                   height: SwipeButton.radius * CGFloat(2)))
             }
-            self.reload(actionWaveAlignment: .left, dx: result.translation.width)
-        }
-
-        let tapGesture = TapGesture().onEnded { result in
-            withAnimation(Animation.spring()) {
-                self.leftWaveData = self.leftWaveData.tapEnd()
+            .stroke().opacity(0.2)
+            Path { path in
+                path.move(to: CGPoint(x: -2, y: -5))
+                path.addLine(to: CGPoint(x: 2, y: 0))
+                path.addLine(to: CGPoint(x: -2, y: 5))
             }
-            self.reload(actionWaveAlignment: .left, dx: 1000)
+            .stroke(Color.white, lineWidth: 2)
         }
-
-        return wave
-            .foregroundColor(colors[prevIndex()])
-            .gesture(dragGesture.simultaneously(with: tapGesture))
     }
-    
-    func rightWave() -> some View {
-        let wave = WaveView(data: rightWaveData)
 
-        let dragGesture = DragGesture()
-            .onChanged { result in
-                self.topWave = WaveSide.right
-                self.rightWaveData = self.rightWaveData.dragChange(location: result.location, translation: result.translation)
+    func wave(data: Binding<WaveData>) -> some View {
+        let gesture = DragGesture().onChanged { result in
+            self.topWave = data.value.side
+            data.value = data.value.dragChange(location: result.location, translation: result.translation)
         }
         .onEnded { result in
             withAnimation(.spring()) {
-                self.rightWaveData = self.rightWaveData.dragEnd(location: result.location, translation: result.translation)
+                data.value = data.value.dragEnd(location: result.location, translation: result.translation)
             }
-            self.reload(actionWaveAlignment: .right, dx: -result.translation.width)
+            let sign: CGFloat = data.value.side == .left ? 1 : -1
+            self.drop(at: sign * result.translation.width, side: data.value.side)
         }
-
-        let tapGesture = TapGesture().onEnded { result in
-            withAnimation(Animation.spring()) {
-                self.rightWaveData = self.rightWaveData.tapEnd()
+        .simultaneously(with: TapGesture().onEnded { result in
+            withAnimation(.spring()) {
+                data.value = data.value.tapEnd()
             }
-            self.reload(actionWaveAlignment: .right, dx: 1000)
-        }
-
-        return wave
-            .foregroundColor(colors[nextIndex()])
-            .gesture(dragGesture.simultaneously(with: tapGesture))
+            self.swipe(to: data.value.side)
+        })
+        return WaveView(data: data.value).gesture(gesture)
     }
 
-    func rightDragAreaIcon() -> some View {
-        return rightWaveData.button()
-    }
-
-    func leftDragAreaIcon() -> some View {
-        return leftWaveData.button()
-    }
-
-    private func reload(actionWaveAlignment: WaveSide, dx: CGFloat) {
-        let progress = WaveView.getProgress(dx: dx)
-
-        if progress > 0.15 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.pageIndex = actionWaveAlignment == .left ? self.prevIndex() : self.nextIndex()
-
-                self.leftWaveData = self.leftWaveData.reload()
-                self.rightWaveData = self.rightWaveData.reload()
-
-                self.wavesOffset = 100
-
-                withAnimation(.spring()) {
-                    self.leftWaveData = self.leftWaveData.show()
-                    self.rightWaveData = self.rightWaveData.show()
-                    self.wavesOffset = 0
-                }
-            }
+    private func drop(at dx: CGFloat, side: WaveSide) {
+        if WaveView.getProgress(dx: dx) > 0.15 {
+            swipe(to: side)
         } else {
-            withAnimation(.basic()) {
+            withAnimation(.spring()) {
                 self.leftWaveData = self.leftWaveData.back()
                 self.rightWaveData = self.rightWaveData.back()
+            }
+        }
+    }
+
+    private func swipe(to side: WaveSide) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.pageIndex = side == .left ? self.prevIndex() : self.nextIndex()
+
+            self.leftWaveData = self.leftWaveData.reload()
+            self.rightWaveData = self.rightWaveData.reload()
+            self.wavesOffset = 100
+            
+            withAnimation(.spring()) {
+                self.leftWaveData = self.leftWaveData.show()
+                self.rightWaveData = self.rightWaveData.show()
+                self.wavesOffset = 0
             }
         }
     }
