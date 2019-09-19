@@ -8,61 +8,38 @@
 
 import SwiftUI
 
-enum WaveSide {
-    case left
-    case right
-}
-
 struct WaveView: Shape {
 
     internal var animatableData: AnimatablePair<CGFloat, CGFloat> {
-        get { AnimatablePair(dx, y) }
+        get { AnimatablePair(progress, y) }
         set {
-            dx = newValue.first
+            progress = newValue.first
             y = newValue.second
         }
     }
 
     private let side: WaveSide
-    private var dx: CGFloat
+    private var progress: CGFloat
     private var y: CGFloat
 
     init(data: WaveData) {
         self.side = data.side
-        self.dx = data.draggingPoint.x
-        self.y = data.draggingPoint.y
+        self.progress = CGFloat(data.progress)
+        self.y = CGFloat(data.y)
     }
 
     func path(in rect: CGRect) -> Path {
-        return build(cy: y, progress: dx)
+        return build(cy: y, progress: progress)
     }
     
     private func build(cy: CGFloat, progress: CGFloat) -> Path {
         let side = WaveView.adjust(from: 15, to: WaveView.bounds.width, p: progress, min: 0.2, max: 0.8)
         let hr = WaveView.getHr(from: 48, to: WaveView.bounds.width * 0.8, p: progress)
         let vr = WaveView.adjust(from: 82, to: WaveView.bounds.height * 0.9, p: progress, max: 0.4)
-        let opacity = max(1 - progress * 5, 0)
-        return build(cy: cy, hr: hr, vr: vr, side: side, opacity: opacity)
+        return build(cy: cy, hr: hr, vr: vr, side: side)
     }
 
-    static func adjustedDragPoint(point: CGPoint, alignment: WaveSide) -> (CGPoint, Double) {
-        var dx = alignment == .left ? point.x : -point.x
-        let progress = WaveView.getProgress(dx: dx)
-        let side = WaveView.adjust(from: 15, to: bounds.width, p: progress, min: 0.2, max: 0.8)
-        let hr = WaveView.getHr(from: 48, to: bounds.width * 0.8, p: progress)
-        //  let vr = WaveView.adjust(from: 82, to: sizeH * 0.9, p: progress, max: 0.4)
-        let opacity = max(1 - progress * 5, 0)
-        
-        let xSide = alignment == .left ? side : bounds.width - side
-        let sign: CGFloat = alignment == .left ? 1.0 : -1.0
-        
-        dx = xSide + sign * hr
-        let dx2 = alignment == .left ? -SwipeButton.radius - 8 : SwipeButton.radius + 8
-        
-        return (CGPoint(x: dx + dx2, y: point.y), Double(opacity))
-    }
-
-    private func build(cy: CGFloat, hr: CGFloat, vr: CGFloat, side: CGFloat, opacity: CGFloat) -> Path {
+    private func build(cy: CGFloat, hr: CGFloat, vr: CGFloat, side: CGFloat) -> Path {
         let isLeft = self.side == .left
         let xSide = isLeft ? side : WaveView.bounds.width - side
         let curveStartY = vr + cy
@@ -140,83 +117,3 @@ struct WaveView: Shape {
         0.31874, 1.57142, 0.23320, 1.62041, 0.15411, 1.68740,
         0.05099, 1.77475,       0, 1.87092,       0,       2]
 }
-
-struct WaveData {
-
-    let side: WaveSide
-    let draggingPoint: CGPoint
-    let buttonCenter: CGPoint
-    let buttonOpacity: Double
-
-    init(side: WaveSide, point: CGPoint, center: CGPoint, opacity: Double) {
-        self.side = side
-        self.draggingPoint = point
-        self.buttonCenter = center
-        self.buttonOpacity = opacity
-    }
-
-    init(side: WaveSide) {
-        let x = SwipeButton.radius + 4
-        let y: CGFloat = side == .left ? 100 : 300
-        self.side = side
-        self.draggingPoint = CGPoint(x: 0.01, y: y)
-        self.buttonCenter = CGPoint(x: side == .left ? x : WaveView.bounds.width - x, y: y)
-        self.buttonOpacity = 1
-    }
-
-    func tapEnd() -> WaveData {
-        return WaveData(side: side, point: CGPoint(x: 1, y: 0), center: buttonCenter, opacity: 0)
-    }
-
-    func dragChange(location: CGPoint, translation: CGSize) -> WaveData {
-        let point = self.calculatePoint(location: location, translation: translation, alignment: side, isDragging: true)
-        let data = WaveView.adjustedDragPoint(point: CGPoint(x: translation.width, y: location.y), alignment: side)
-        return WaveData(side: side, point: point, center: data.0, opacity: data.1)
-    }
-
-    func dragEnd(location: CGPoint, translation: CGSize) -> WaveData {
-        let point = self.calculatePoint(location: location, translation: translation, alignment: side, isDragging: false)
-        return WaveData(side: side, point: point, center: buttonCenter, opacity: 0)
-    }
-
-    func calculatePoint(location: CGPoint, translation: CGSize, alignment: WaveSide, isDragging: Bool) -> CGPoint {
-        let dx = alignment == .left ? translation.width : -translation.width
-        var progress = WaveView.getProgress(dx: dx)
-        
-        if !isDragging {
-            let success = progress > 0.15
-            progress = WaveView.adjust(from: progress, to: success ? 1 : 0, p: 1.0)
-        }
-        
-        return CGPoint(x: progress, y: location.y)
-    }
-
-    func reload() -> WaveData {
-        let pad: CGFloat = 16.0
-        let x = SwipeButton.radius + 4
-        let y: CGFloat = side == .left ? 100 : 300
-        let point = calculatePoint(location: CGPoint(x: 0, y: y), translation: CGSize(width: pad, height: 0), alignment: .left, isDragging: false)
-        let center = CGPoint(x: side == .left ? x : WaveView.bounds.width - x, y: y)
-        return WaveData(side: side, point: point, center: center, opacity: buttonOpacity)
-    }
-
-    func show() -> WaveData {
-        return WaveData(side: side, point: draggingPoint, center: buttonCenter, opacity: 1)
-    }
-
-    func back() -> WaveData {
-        let x = SwipeButton.radius + 4
-        let center = CGPoint(x: side == .left ? x : WaveView.bounds.width - x, y: draggingPoint.y)
-        return WaveData(side: side, point: draggingPoint, center: center, opacity: 1)
-    }
-
-}
-
-struct SwipeButton {
-
-    static let radius: CGFloat = 24.0
-
-}
-
-
-

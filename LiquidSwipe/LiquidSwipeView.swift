@@ -13,125 +13,98 @@ struct LiquidSwipeView: View {
     @State var topWave = WaveSide.right
     @State var pageIndex = 0
 
-    @State var wavesOffset: CGFloat = 0
-    @State var leftWaveData = WaveData(side: .left)
-    @State var rightWaveData = WaveData(side: .right)
-
-    let colors = [0x0074D9, 0x7FDBFF, 0x39CCCC, 0x3D9970, 0x2ECC40, 0x01FF70,
-                  0xFFDC00, 0xFF851B, 0xFF4136, 0xF012BE, 0xB10DC9, 0xAAAAAA]
-                 .shuffled().map { val in Color(hex: val) }
+    @State var waveOffset: CGFloat = 0
+    @State var leftWave = WaveData(side: .left)
+    @State var rightWave = WaveData(side: .right)
 
     var body: some View {
         ZStack {
-            Rectangle().foregroundColor(colors[pageIndex])
+            content()
 
             ZStack {
-                wave(data: $leftWaveData)
-                    .foregroundColor(colors[prevIndex()])
-                button()
-                    .offset(x: leftWaveData.buttonCenter.x,
-                            y: leftWaveData.buttonCenter.y)
-                    .opacity(leftWaveData.buttonOpacity)
+                wave(of: $leftWave)
+                button(of: leftWave)
             }
             .zIndex(topWave == WaveSide.left ? 1 : 0)
-            .offset(x: -wavesOffset)
+            .offset(x: -waveOffset)
 
             ZStack {
-                wave(data: $rightWaveData)
-                    .foregroundColor(colors[nextIndex()])
-                button()
-                    .offset(x: rightWaveData.buttonCenter.x,
-                            y: rightWaveData.buttonCenter.y)
-                    .opacity(rightWaveData.buttonOpacity)
+                wave(of: $rightWave)
+                button(of: rightWave)
             }
             .zIndex(topWave == WaveSide.left ? 0 : 1)
-            .offset(x: wavesOffset)
+            .offset(x: waveOffset)
         }
         .edgesIgnoringSafeArea(.vertical)
     }
 
-    func button() -> some View {
+    func content() -> some View {
+        return Rectangle().foregroundColor(WaveConfig.colors[pageIndex])
+    }
+
+    func button(of wave: WaveData) -> some View {
+        let r = WaveConfig.buttonRadius
+        let d = r * 2
+        let hw = (wave.side == .left ? 1 : -1) * WaveConfig.arrowWidth / 2
+        let hh = WaveConfig.arrowHeight / 2
         return ZStack {
             Path { path in
-                path.addEllipse(in: CGRect(x: -SwipeButton.radius,
-                   y: -SwipeButton.radius,
-                   width: SwipeButton.radius * CGFloat(2),
-                   height: SwipeButton.radius * CGFloat(2)))
+                path.addEllipse(in: CGRect(x: -r, y: -r, width: d, height: d))
             }
             .stroke().opacity(0.2)
             Path { path in
-                path.move(to: CGPoint(x: -2, y: -5))
-                path.addLine(to: CGPoint(x: 2, y: 0))
-                path.addLine(to: CGPoint(x: -2, y: 5))
+                path.move(to: CGPoint(x: -hw, y: -hh))
+                path.addLine(to: CGPoint(x: hw, y: 0))
+                path.addLine(to: CGPoint(x: -hw, y: hh))
             }
             .stroke(Color.white, lineWidth: 2)
         }
+        .offset(wave.buttonOffset)
+        .opacity(wave.buttonOpacity)
     }
 
-    func wave(data: Binding<WaveData>) -> some View {
-        let gesture = DragGesture().onChanged { result in
+    func wave(of data: Binding<WaveData>) -> some View {
+        let gesture = DragGesture().onChanged {
             self.topWave = data.value.side
-            data.value = data.value.dragChange(location: result.location, translation: result.translation)
+            data.value = data.value.drag(value: $0)
         }
-        .onEnded { result in
-            withAnimation(.spring()) {
-                data.value = data.value.dragEnd(location: result.location, translation: result.translation)
+        .onEnded {
+            if data.value.isCancelled(value: $0) {
+                withAnimation(.spring()) {
+                    data.value = data.value.initial()
+                }
+            } else {
+                self.swipe(data: data)
             }
-            let sign: CGFloat = data.value.side == .left ? 1 : -1
-            self.drop(at: sign * result.translation.width, side: data.value.side)
         }
-        .simultaneously(with: TapGesture().onEnded { result in
-            withAnimation(.spring()) {
-                data.value = data.value.tapEnd()
-            }
-            self.swipe(to: data.value.side)
+        .simultaneously(with: TapGesture().onEnded {
+            self.swipe(data: data)
         })
         return WaveView(data: data.value).gesture(gesture)
+            .foregroundColor(WaveConfig.colors[index(of: data.value)])
     }
 
-    private func drop(at dx: CGFloat, side: WaveSide) {
-        if WaveView.getProgress(dx: dx) > 0.15 {
-            swipe(to: side)
-        } else {
-            withAnimation(.spring()) {
-                self.leftWaveData = self.leftWaveData.back()
-                self.rightWaveData = self.rightWaveData.back()
-            }
+    private func swipe(data: Binding<WaveData>) {
+        withAnimation(.spring()) {
+            data.value = data.value.swipe()
         }
-    }
-
-    private func swipe(to side: WaveSide) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.pageIndex = side == .left ? self.prevIndex() : self.nextIndex()
+            self.pageIndex = self.index(of: data.value)
+            self.leftWave = self.leftWave.initial()
+            self.rightWave = self.rightWave.initial()
+            self.waveOffset = 100
 
-            self.leftWaveData = self.leftWaveData.reload()
-            self.rightWaveData = self.rightWaveData.reload()
-            self.wavesOffset = 100
-            
             withAnimation(.spring()) {
-                self.leftWaveData = self.leftWaveData.show()
-                self.rightWaveData = self.rightWaveData.show()
-                self.wavesOffset = 0
+                self.waveOffset = 0
             }
         }
     }
 
-    private func nextIndex() -> Int {
-        return pageIndex == colors.count - 1 ? 0 : pageIndex + 1
+    private func index(of wave: WaveData) -> Int {
+        let last = WaveConfig.colors.count - 1
+        return wave.side == .left
+            ? (pageIndex == 0 ? last : pageIndex - 1)
+            : (pageIndex == last ? 0 : pageIndex + 1)
     }
 
-    private func prevIndex() -> Int {
-        return pageIndex == 0 ? colors.count - 1 : pageIndex - 1
-    }
-
-}
-
-extension Color {
-    init(hex: Int) {
-        self.init(
-            red: Double((hex >> 16) & 0xff) / 255,
-            green: Double((hex >> 08) & 0xff) / 255,
-            blue: Double((hex >> 00) & 0xff) / 255
-        )
-    }
 }

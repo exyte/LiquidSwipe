@@ -14,6 +14,7 @@
 		42D891A822FC618E004105D9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 42D891A722FC618E004105D9 /* Assets.xcassets */; };
 		42D891AB22FC618E004105D9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 42D891AA22FC618E004105D9 /* Preview Assets.xcassets */; };
 		42D891AE22FC618E004105D9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 42D891AC22FC618E004105D9 /* LaunchScreen.storyboard */; };
+		58A2AE97233282DA00D9F73D /* WaveData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58A2AE96233282DA00D9F73D /* WaveData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		42D891AA22FC618E004105D9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		42D891AD22FC618E004105D9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		42D891AF22FC618E004105D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		58A2AE96233282DA00D9F73D /* WaveData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 				42D891A122FC618D004105D9 /* AppDelegate.swift */,
 				42D891A322FC618D004105D9 /* SceneDelegate.swift */,
 				42D891A522FC618D004105D9 /* LiquidSwipeView.swift */,
+				58A2AE96233282DA00D9F73D /* WaveData.swift */,
 				423BFC562301BE0000CD4856 /* WaveView.swift */,
 				42D891A722FC618E004105D9 /* Assets.xcassets */,
 				42D891AC22FC618E004105D9 /* LaunchScreen.storyboard */,
@@ -151,6 +154,7 @@
 			files = (
 				42D891A222FC618D004105D9 /* AppDelegate.swift in Sources */,
 				423BFC572301BE0000CD4856 /* WaveView.swift in Sources */,
+				58A2AE97233282DA00D9F73D /* WaveData.swift in Sources */,
 				42D891A422FC618D004105D9 /* SceneDelegate.swift in Sources */,
 				42D891A622FC618D004105D9 /* LiquidSwipeView.swift in Sources */,
 			);
