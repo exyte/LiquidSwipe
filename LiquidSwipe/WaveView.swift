@@ -74,10 +74,6 @@ struct WaveView: Shape {
         return path
     }
 
-    static func getProgress(dx: CGFloat) -> CGFloat {
-        return min(1.0, max(0, dx * 0.45 / UIScreen.main.bounds.size.width))
-    }
-
     static func getHr(from: CGFloat, to: CGFloat, p: CGFloat) -> CGFloat {
         let p1: CGFloat = 0.4
         if p <= p1 {

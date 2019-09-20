@@ -40,16 +40,16 @@ public struct WaveData {
         self.init(side: side, y: side == .left ? 100.0 : 300.0, progress: 0)
     }
 
-    init(side: WaveSide, y: CGFloat, dx: CGFloat) {
+    private init(side: WaveSide, y: CGFloat, dx: CGFloat) {
         self.init(side: side, y: Double(y), dx: Double(dx))
     }
 
-    init(side: WaveSide, y: Double, dx: Double) {
+    private init(side: WaveSide, y: Double, dx: Double) {
         let progress = min(1.0, max(0, (side == .left ? dx : -dx) * 0.45 / WaveData.width))
         self.init(side: side, y: y, progress: progress)
     }
 
-    init(side: WaveSide, y: Double, progress: Double) {
+    private init(side: WaveSide, y: Double, progress: Double) {
         let width = WaveData.width
 
         let shift = 15.0.interpolate(to: width, fraction: progress, min: 0.2, max: 0.8)
@@ -62,7 +62,7 @@ public struct WaveData {
         self.init(side: side, y: y, progress: progress, offset: offset)
     }
 
-    init(side: WaveSide, y: Double, progress: Double, offset: CGSize) {
+    private init(side: WaveSide, y: Double, progress: Double, offset: CGSize) {
         self.side = side
         self.y = y
         self.progress = progress
@@ -73,7 +73,7 @@ public struct WaveData {
         return WaveData(side: side, y: value.location.y, dx: value.translation.width)
     }
 
-    func swipe() -> WaveData {
+    func final() -> WaveData {
         return WaveData(side: side, y: y, progress: 1)
     }
 

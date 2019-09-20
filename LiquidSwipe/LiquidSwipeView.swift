@@ -10,60 +10,47 @@ import SwiftUI
 
 struct LiquidSwipeView: View {
 
-    @State var topWave = WaveSide.right
-    @State var pageIndex = 0
+    @State var leftData = WaveData(side: .left)
+    @State var rightData = WaveData(side: .right)
 
+    @State var pageIndex = 0
+    @State var topWave = WaveSide.right
     @State var waveOffset: CGFloat = 0
-    @State var leftWave = WaveData(side: .left)
-    @State var rightWave = WaveData(side: .right)
 
     var body: some View {
         ZStack {
             content()
-
-            ZStack {
-                wave(of: $leftWave)
-                button(of: leftWave)
-            }
-            .zIndex(topWave == WaveSide.left ? 1 : 0)
-            .offset(x: -waveOffset)
-
-            ZStack {
-                wave(of: $rightWave)
-                button(of: rightWave)
-            }
-            .zIndex(topWave == WaveSide.left ? 0 : 1)
-            .offset(x: waveOffset)
+            slider(data: $leftData)
+            slider(data: $rightData)
         }
         .edgesIgnoringSafeArea(.vertical)
+    }
+
+    func slider(data: Binding<WaveData>) -> some View {
+        return ZStack {
+            wave(data: data)
+            button(data: data.value)
+        }
+        .zIndex(topWave == data.value.side ? 1 : 0)
+        .offset(x: data.value.side == .left ? -waveOffset : waveOffset)
     }
 
     func content() -> some View {
         return Rectangle().foregroundColor(WaveConfig.colors[pageIndex])
     }
 
-    func button(of wave: WaveData) -> some View {
-        let r = WaveConfig.buttonRadius
-        let d = r * 2
-        let hw = (wave.side == .left ? 1 : -1) * WaveConfig.arrowWidth / 2
-        let hh = WaveConfig.arrowHeight / 2
+    func button(data: WaveData) -> some View {
+        let aw = (data.side == .left ? 1 : -1) * WaveConfig.arrowWidth / 2
+        let ah = WaveConfig.arrowHeight / 2
         return ZStack {
-            Path { path in
-                path.addEllipse(in: CGRect(x: -r, y: -r, width: d, height: d))
-            }
-            .stroke().opacity(0.2)
-            Path { path in
-                path.move(to: CGPoint(x: -hw, y: -hh))
-                path.addLine(to: CGPoint(x: hw, y: 0))
-                path.addLine(to: CGPoint(x: -hw, y: hh))
-            }
-            .stroke(Color.white, lineWidth: 2)
+            circle(radius: WaveConfig.buttonRadius).stroke().opacity(0.2)
+            polyline(-aw, -ah, aw, 0, -aw, ah).stroke(Color.white, lineWidth: 2)
         }
-        .offset(wave.buttonOffset)
-        .opacity(wave.buttonOpacity)
+        .offset(data.buttonOffset)
+        .opacity(data.buttonOpacity)
     }
 
-    func wave(of data: Binding<WaveData>) -> some View {
+    func wave(data: Binding<WaveData>) -> some View {
         let gesture = DragGesture().onChanged {
             self.topWave = data.value.side
             data.value = data.value.drag(value: $0)
@@ -78,6 +65,7 @@ struct LiquidSwipeView: View {
             }
         }
         .simultaneously(with: TapGesture().onEnded {
+            self.topWave = data.value.side
             self.swipe(data: data)
         })
         return WaveView(data: data.value).gesture(gesture)
@@ -86,14 +74,14 @@ struct LiquidSwipeView: View {
 
     private func swipe(data: Binding<WaveData>) {
         withAnimation(.spring()) {
-            data.value = data.value.swipe()
+            data.value = data.value.final()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.pageIndex = self.index(of: data.value)
-            self.leftWave = self.leftWave.initial()
-            self.rightWave = self.rightWave.initial()
-            self.waveOffset = 100
+            self.leftData = self.leftData.initial()
+            self.rightData = self.rightData.initial()
 
+            self.waveOffset = 100
             withAnimation(.spring()) {
                 self.waveOffset = 0
             }
@@ -105,6 +93,21 @@ struct LiquidSwipeView: View {
         return wave.side == .left
             ? (pageIndex == 0 ? last : pageIndex - 1)
             : (pageIndex == last ? 0 : pageIndex + 1)
+    }
+
+    private func circle(radius: Double) -> Path {
+        return Path { path in
+            path.addEllipse(in: CGRect(x: -radius, y: -radius, width: radius * 2, height: radius * 2))
+        }
+    }
+    
+    private func polyline(_ values: Double...) -> Path {
+        return Path { path in
+            path.move(to: CGPoint(x: values[0], y: values[1]))
+            for i in stride(from: 2, to: values.count, by: 2) {
+                path.addLine(to: CGPoint(x: values[i], y: values[i + 1]))
+            }
+        }
     }
 
 }
