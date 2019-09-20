@@ -10,98 +10,60 @@ import SwiftUI
 
 struct WaveView: Shape {
 
-    internal var animatableData: AnimatablePair<CGFloat, CGFloat> {
-        get { AnimatablePair(progress, y) }
-        set {
-            progress = newValue.first
-            y = newValue.second
-        }
-    }
-
     private let side: WaveSide
-    private var progress: CGFloat
-    private var y: CGFloat
+    private var centerY: Double
+    private var progress: Double
 
     init(data: WaveData) {
         self.side = data.side
-        self.progress = CGFloat(data.progress)
-        self.y = CGFloat(data.y)
+        self.centerY = data.centerY
+        self.progress = data.progress
+    }
+
+    internal var animatableData: AnimatablePair<Double, Double> {
+        get { AnimatablePair(centerY, progress) }
+        set {
+            centerY = newValue.first
+            progress = newValue.second
+        }
     }
 
     func path(in rect: CGRect) -> Path {
-        return build(cy: y, progress: progress)
-    }
-    
-    private func build(cy: CGFloat, progress: CGFloat) -> Path {
-        let side = WaveView.adjust(from: 15, to: WaveView.bounds.width, p: progress, min: 0.2, max: 0.8)
-        let hr = WaveView.getHr(from: 48, to: WaveView.bounds.width * 0.8, p: progress)
-        let vr = WaveView.adjust(from: 82, to: WaveView.bounds.height * 0.9, p: progress, max: 0.4)
-        return build(cy: cy, hr: hr, vr: vr, side: side)
-    }
-
-    private func build(cy: CGFloat, hr: CGFloat, vr: CGFloat, side: CGFloat) -> Path {
-        let isLeft = self.side == .left
-        let xSide = isLeft ? side : WaveView.bounds.width - side
-        let curveStartY = vr + cy
-        let sign: CGFloat = isLeft ? 1.0 : -1.0
-
         var path = Path()
-        let x = isLeft ? -50 : WaveView.bounds.width + 50
-        path.move(to: CGPoint(x: xSide, y: -100))
+        let data = WaveData(side: side, centerY: centerY, progress: progress)
+        let waveLedge = data.waveLedgeX
+        let hr = data.waveHorizontalRadius
+        let vr = data.waveVerticalRadius
+        let curveStartY = vr + data.centerY
+        let isLeft = self.side == .left
+        let sign = isLeft ? 1.0 : -1.0
+
+        let x = isLeft ? -50 : WaveData.width + 50
+        path.move(to: CGPoint(x: waveLedge, y: -100))
         path.addLine(to: CGPoint(x: x, y: -100))
-        path.addLine(to: CGPoint(x: x, y: WaveView.bounds.height))
-        path.addLine(to: CGPoint(x: xSide, y: WaveView.bounds.height))
-        path.addLine(to: CGPoint(x: xSide, y: curveStartY))
+        path.addLine(to: CGPoint(x: x, y: WaveData.height))
+        path.addLine(to: CGPoint(x: waveLedge, y: WaveData.height))
+        path.addLine(to: CGPoint(x: waveLedge, y: curveStartY))
 
         var index = 0
         while index < WaveView.data.count {
-            let x1 = xSide + sign * hr * WaveView.data[index]
+            let x1 = waveLedge + sign * hr * WaveView.data[index]
             let y1 = curveStartY - vr * WaveView.data[index + 1]
-            let x2 = xSide + sign * hr * WaveView.data[index + 2]
+            let x2 = waveLedge + sign * hr * WaveView.data[index + 2]
             let y2 = curveStartY - vr * WaveView.data[index + 3]
-            let x = xSide + sign * hr * WaveView.data[index + 4]
+            let x = waveLedge + sign * hr * WaveView.data[index + 4]
             let y = curveStartY - vr * WaveView.data[index + 5]
-
-            let point = CGPoint(x: x, y: y)
-            let control1 = CGPoint(x: x1, y: y1)
-            let control2 = CGPoint(x: x2, y: y2)
-
-            path.addCurve(to: point, control1: control1, control2: control2)
-
             index += 6
+
+            path.addCurve(to: CGPoint(x: x, y: y),
+                          control1: CGPoint(x: x1, y: y1),
+                          control2: CGPoint(x: x2, y: y2))
         }
 
         return path
     }
 
-    static func getHr(from: CGFloat, to: CGFloat, p: CGFloat) -> CGFloat {
-        let p1: CGFloat = 0.4
-        if p <= p1 {
-            return adjust(from: from, to: to, p: p, max: p1)
-        } else if p >= 1 {
-            return to
-        }
-        let t = (p - p1) / (1 - p1)
-        let m: CGFloat = 9.8
-        let beta: CGFloat = 40.0 / (2 * m)
-        let omega = pow(-pow(beta, 2) + pow(50.0 / m, 2), 0.5)
-        return to * exp(-beta * t) * cos(omega * t)
-    }
-    
-    static func adjust(from: CGFloat, to: CGFloat, p: CGFloat, min: CGFloat = 0, max: CGFloat = 1) -> CGFloat {
-        if p <= min {
-            return from
-        } else if p >= max {
-            return to
-        }
-        return from + (to - from) * (p - min) / (max - min)
-    }
-
-    static var bounds: CGRect {
-        return UIScreen.main.bounds
-    }
-
-    private static let data: [CGFloat] = [
+    private static let data = [
         0, 0.13461, 0.05341, 0.24127, 0.15615, 0.33223,
         0.23616, 0.40308, 0.33052, 0.45611, 0.50124, 0.53505,
         0.51587, 0.54182, 0.56641, 0.56503, 0.57493, 0.56896,
@@ -112,4 +74,5 @@ struct WaveView: Shape {
         0.52418, 1.46896, 0.50573, 1.47816, 0.50153, 1.48026,
         0.31874, 1.57142, 0.23320, 1.62041, 0.15411, 1.68740,
         0.05099, 1.77475,       0, 1.87092,       0,       2]
+
 }

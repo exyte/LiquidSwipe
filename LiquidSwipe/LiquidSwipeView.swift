@@ -100,7 +100,7 @@ struct LiquidSwipeView: View {
             path.addEllipse(in: CGRect(x: -radius, y: -radius, width: radius * 2, height: radius * 2))
         }
     }
-    
+
     private func polyline(_ values: Double...) -> Path {
         return Path { path in
             path.move(to: CGPoint(x: values[0], y: values[1]))
