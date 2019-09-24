@@ -10,12 +10,12 @@ import SwiftUI
 
 struct LiquidSwipeView: View {
 
-    @State var leftData = WaveData(side: .left)
-    @State var rightData = WaveData(side: .right)
+    @State var leftData = SliderData(side: .left)
+    @State var rightData = SliderData(side: .right)
 
     @State var pageIndex = 0
-    @State var topWave = WaveSide.right
-    @State var waveOffset: CGFloat = 0
+    @State var topSlider = SliderSide.right
+    @State var sliderOffset: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -26,33 +26,33 @@ struct LiquidSwipeView: View {
         .edgesIgnoringSafeArea(.vertical)
     }
 
-    func slider(data: Binding<WaveData>) -> some View {
+    func slider(data: Binding<SliderData>) -> some View {
         return ZStack {
             wave(data: data)
             button(data: data.value)
         }
-        .zIndex(topWave == data.value.side ? 1 : 0)
-        .offset(x: data.value.side == .left ? -waveOffset : waveOffset)
+        .zIndex(topSlider == data.value.side ? 1 : 0)
+        .offset(x: data.value.side == .left ? -sliderOffset : sliderOffset)
     }
 
     func content() -> some View {
-        return Rectangle().foregroundColor(WaveConfig.colors[pageIndex])
+        return Rectangle().foregroundColor(Config.colors[pageIndex])
     }
 
-    func button(data: WaveData) -> some View {
-        let aw = (data.side == .left ? 1 : -1) * WaveConfig.arrowWidth / 2
-        let ah = WaveConfig.arrowHeight / 2
+    func button(data: SliderData) -> some View {
+        let aw = (data.side == .left ? 1 : -1) * Config.arrowWidth / 2
+        let ah = Config.arrowHeight / 2
         return ZStack {
-            circle(radius: WaveConfig.buttonRadius).stroke().opacity(0.2)
+            circle(radius: Config.buttonRadius).stroke().opacity(0.2)
             polyline(-aw, -ah, aw, 0, -aw, ah).stroke(Color.white, lineWidth: 2)
         }
         .offset(data.buttonOffset)
         .opacity(data.buttonOpacity)
     }
 
-    func wave(data: Binding<WaveData>) -> some View {
+    func wave(data: Binding<SliderData>) -> some View {
         let gesture = DragGesture().onChanged {
-            self.topWave = data.value.side
+            self.topSlider = data.value.side
             data.value = data.value.drag(value: $0)
         }
         .onEnded {
@@ -65,14 +65,14 @@ struct LiquidSwipeView: View {
             }
         }
         .simultaneously(with: TapGesture().onEnded {
-            self.topWave = data.value.side
+            self.topSlider = data.value.side
             self.swipe(data: data)
         })
         return WaveView(data: data.value).gesture(gesture)
-            .foregroundColor(WaveConfig.colors[index(of: data.value)])
+            .foregroundColor(Config.colors[index(of: data.value)])
     }
 
-    private func swipe(data: Binding<WaveData>) {
+    private func swipe(data: Binding<SliderData>) {
         withAnimation(.spring()) {
             data.value = data.value.final()
         }
@@ -81,18 +81,20 @@ struct LiquidSwipeView: View {
             self.leftData = self.leftData.initial()
             self.rightData = self.rightData.initial()
 
-            self.waveOffset = 100
+            self.sliderOffset = 100
             withAnimation(.spring()) {
-                self.waveOffset = 0
+                self.sliderOffset = 0
             }
         }
     }
 
-    private func index(of wave: WaveData) -> Int {
-        let last = WaveConfig.colors.count - 1
-        return wave.side == .left
-            ? (pageIndex == 0 ? last : pageIndex - 1)
-            : (pageIndex == last ? 0 : pageIndex + 1)
+    private func index(of data: SliderData) -> Int {
+        let last = Config.colors.count - 1
+        if data.side == .left {
+            return pageIndex == 0 ? last : pageIndex - 1
+        } else {
+            return pageIndex == last ? 0 : pageIndex + 1
+        }
     }
 
     private func circle(radius: Double) -> Path {

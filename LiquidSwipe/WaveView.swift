@@ -10,11 +10,11 @@ import SwiftUI
 
 struct WaveView: Shape {
 
-    private let side: WaveSide
+    private let side: SliderSide
     private var centerY: Double
     private var progress: Double
 
-    init(data: WaveData) {
+    init(data: SliderData) {
         self.side = data.side
         self.centerY = data.centerY
         self.progress = data.progress
@@ -30,7 +30,7 @@ struct WaveView: Shape {
 
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let data = WaveData(side: side, centerY: centerY, progress: progress)
+        let data = SliderData(side: side, centerY: centerY, progress: progress)
         let waveLedge = data.waveLedgeX
         let hr = data.waveHorizontalRadius
         let vr = data.waveVerticalRadius
@@ -38,11 +38,11 @@ struct WaveView: Shape {
         let isLeft = self.side == .left
         let sign = isLeft ? 1.0 : -1.0
 
-        let x = isLeft ? -50 : WaveData.width + 50
+        let x = isLeft ? -50 : SliderData.width + 50
         path.move(to: CGPoint(x: waveLedge, y: -100))
         path.addLine(to: CGPoint(x: x, y: -100))
-        path.addLine(to: CGPoint(x: x, y: WaveData.height))
-        path.addLine(to: CGPoint(x: waveLedge, y: WaveData.height))
+        path.addLine(to: CGPoint(x: x, y: SliderData.height))
+        path.addLine(to: CGPoint(x: waveLedge, y: SliderData.height))
         path.addLine(to: CGPoint(x: waveLedge, y: curveStartY))
 
         var index = 0

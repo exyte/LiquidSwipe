@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public struct WaveConfig {
+struct Config {
 
     static let leftWaveY = 100.0
     static let rightWaveY = 300.0
@@ -28,22 +28,22 @@ public struct WaveConfig {
 
 }
 
-public enum WaveSide {
+enum SliderSide {
     case left
     case right
 }
 
-public struct WaveData {
+struct SliderData {
 
-    let side: WaveSide
+    let side: SliderSide
     let centerY: Double
     let progress: Double
 
-    init(side: WaveSide) {
-        self.init(side: side, centerY: side == .left ? WaveConfig.leftWaveY : WaveConfig.rightWaveY, progress: 0)
+    init(side: SliderSide) {
+        self.init(side: side, centerY: side == .left ? Config.leftWaveY : Config.rightWaveY, progress: 0)
     }
 
-    init(side: WaveSide, centerY: Double, progress: Double) {
+    init(side: SliderSide, centerY: Double, progress: Double) {
         self.side = side
         self.centerY = centerY
         self.progress = progress
@@ -51,7 +51,7 @@ public struct WaveData {
 
     var buttonOffset: CGSize {
         let sign = side == .left ? 1.0 : -1.0
-        let hs = WaveConfig.buttonRadius + WaveConfig.buttonMargin
+        let hs = Config.buttonRadius + Config.buttonMargin
         return CGSize(width: waveLedgeX + sign * (waveHorizontalRadius - hs), height: centerY)
     }
 
@@ -60,15 +60,15 @@ public struct WaveData {
     }
 
     var waveLedgeX: Double {
-        let ledge = WaveConfig.waveMinLedge.interpolate(to: WaveData.width, in: progress, min: 0.2, max: 0.8)
-        return side == .left ? ledge : WaveData.width - ledge
+        let ledge = Config.waveMinLedge.interpolate(to: SliderData.width, in: progress, min: 0.2, max: 0.8)
+        return side == .left ? ledge : SliderData.width - ledge
     }
 
     var waveHorizontalRadius: Double {
         let p1: Double = 0.4
-        let to = WaveData.width * 0.8
+        let to = SliderData.width * 0.8
         if progress <= p1 {
-            return WaveConfig.waveMinHR.interpolate(to: to, in: progress, max: p1)
+            return Config.waveMinHR.interpolate(to: to, in: progress, max: p1)
         } else if progress >= 1 {
             return to
         }
@@ -80,25 +80,25 @@ public struct WaveData {
     }
 
     var waveVerticalRadius: Double {
-        return WaveConfig.waveMinVR.interpolate(to: WaveData.height * 0.9, in: progress, max: 0.4)
+        return Config.waveMinVR.interpolate(to: SliderData.height * 0.9, in: progress, max: 0.4)
     }
 
-    func initial() -> WaveData {
-        return WaveData(side: side, centerY: centerY, progress: 0)
+    func initial() -> SliderData {
+        return SliderData(side: side, centerY: centerY, progress: 0)
     }
 
-    func final() -> WaveData {
-        return WaveData(side: side, centerY: centerY, progress: 1)
+    func final() -> SliderData {
+        return SliderData(side: side, centerY: centerY, progress: 1)
     }
 
-    func drag(value: DragGesture.Value) -> WaveData {
+    func drag(value: DragGesture.Value) -> SliderData {
         let dx = (side == .left ? 1 : -1) * Double(value.translation.width)
-        let progress = min(1.0, max(0, dx * WaveConfig.swipeVelocity / WaveData.width))
-        return WaveData(side: side, centerY: Double(value.location.y), progress: progress)
+        let progress = min(1.0, max(0, dx * Config.swipeVelocity / SliderData.width))
+        return SliderData(side: side, centerY: Double(value.location.y), progress: progress)
     }
 
     func isCancelled(value: DragGesture.Value) -> Bool {
-        return drag(value: value).progress < WaveConfig.swipeCancelThreshold
+        return drag(value: value).progress < Config.swipeCancelThreshold
     }
 
     static var width: Double {
