@@ -27,12 +27,13 @@ struct LiquidSwipeView: View {
     }
 
     func slider(data: Binding<SliderData>) -> some View {
+        let value = data.wrappedValue
         return ZStack {
             wave(data: data)
-            button(data: data.value)
+            button(data: value)
         }
-        .zIndex(topSlider == data.value.side ? 1 : 0)
-        .offset(x: data.value.side == .left ? -sliderOffset : sliderOffset)
+        .zIndex(topSlider == value.side ? 1 : 0)
+        .offset(x: value.side == .left ? -sliderOffset : sliderOffset)
     }
 
     func content() -> some View {
@@ -52,32 +53,32 @@ struct LiquidSwipeView: View {
 
     func wave(data: Binding<SliderData>) -> some View {
         let gesture = DragGesture().onChanged {
-            self.topSlider = data.value.side
-            data.value = data.value.drag(value: $0)
+            self.topSlider = data.wrappedValue.side
+            data.wrappedValue = data.wrappedValue.drag(value: $0)
         }
         .onEnded {
-            if data.value.isCancelled(value: $0) {
+            if data.wrappedValue.isCancelled(value: $0) {
                 withAnimation(.spring()) {
-                    data.value = data.value.initial()
+                    data.wrappedValue = data.wrappedValue.initial()
                 }
             } else {
                 self.swipe(data: data)
             }
         }
         .simultaneously(with: TapGesture().onEnded {
-            self.topSlider = data.value.side
+            self.topSlider = data.wrappedValue.side
             self.swipe(data: data)
         })
-        return WaveView(data: data.value).gesture(gesture)
-            .foregroundColor(Config.colors[index(of: data.value)])
+        return WaveView(data: data.wrappedValue).gesture(gesture)
+            .foregroundColor(Config.colors[index(of: data.wrappedValue)])
     }
 
     private func swipe(data: Binding<SliderData>) {
         withAnimation(.spring()) {
-            data.value = data.value.final()
+            data.wrappedValue = data.wrappedValue.final()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.pageIndex = self.index(of: data.value)
+            self.pageIndex = self.index(of: data.wrappedValue)
             self.leftData = self.leftData.initial()
             self.rightData = self.rightData.initial()
 
