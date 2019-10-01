@@ -58,7 +58,7 @@ struct LiquidSwipeView: View {
         }
         .onEnded {
             if data.wrappedValue.isCancelled(value: $0) {
-                withAnimation(.spring()) {
+                withAnimation(.spring(dampingFraction: 0.5)) {
                     data.wrappedValue = data.wrappedValue.initial()
                 }
             } else {
@@ -74,7 +74,7 @@ struct LiquidSwipeView: View {
     }
 
     private func swipe(data: Binding<SliderData>) {
-        withAnimation(.spring()) {
+        withAnimation() {
             data.wrappedValue = data.wrappedValue.final()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -83,7 +83,7 @@ struct LiquidSwipeView: View {
             self.rightData = self.rightData.initial()
 
             self.sliderOffset = 100
-            withAnimation(.spring()) {
+            withAnimation(.spring(dampingFraction: 0.5)) {
                 self.sliderOffset = 0
             }
         }
