@@ -5,7 +5,7 @@
 
 <p><h1 align="left">LiquidSwipe</h1></p>
 
-<p><h4>Example of using SwiftUI to create a beatiful Liquid Swipe control</h4></p>
+<p><h4>Example of using SwiftUI to create a beautiful Liquid Swipe control</h4></p>
 
 ___
 
