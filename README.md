@@ -16,10 +16,6 @@ ___
 
 <a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
 
-</br></br>
-
-[![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
-
 # Usage
 This is a ready to run project. Please see more details in the post (TODO: insert a link).
 
