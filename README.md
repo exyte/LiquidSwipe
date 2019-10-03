@@ -1,7 +1,7 @@
 # LiquidSwipe
 
 <img src="https://github.com/exyte/ConcentricOnboarding/blob/master/header.png">
-<img align="right" src="https://i.imgur.com/FLaOlqv.gif" width="480" />
+<img align="right" src="https://raw.githubusercontent.com/exyte/media/master/LiquidSwipe/demo.gif" width="480" />
 
 <p><h1 align="left">LiquidSwipe</h1></p>
 
