@@ -26,4 +26,4 @@ This is a ready to run project. Please see more details in the post (TODO: inser
 
 ## Acknowledgements
 
-Many thanks to [Cuberto team](https://github.com/Cuberto/liquid-swipe) for the inspiration.
+Many thanks to [Cuberto team](https://github.com/Cuberto/liquid-swipe) for their beautiful original work that we recreated with SwiftUI.
