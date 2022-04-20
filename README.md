@@ -17,7 +17,7 @@ ___
 <a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
 
 # Usage
-This is a ready to run project. Please see more details in the post (TODO: insert a link).
+This is a ready to run project. Please see more details in the [post](https://exyte.com/blog/swiftui-tutorial-slider-control).
 
 ## Requirements
 
