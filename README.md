@@ -1,5 +1,3 @@
-# LiquidSwipe
-
 <img src="https://raw.githubusercontent.com/exyte/media/master/common/header.png">
 <img align="right" src="https://raw.githubusercontent.com/exyte/media/master/LiquidSwipe/demo.gif" width="480" />
 
@@ -27,3 +25,14 @@ This is a ready to run project. Please see more details in the [post](https://ex
 ## Acknowledgements
 
 Many thanks to [Cuberto team](https://github.com/Cuberto/liquid-swipe) for their beautiful original work that we recreated with SwiftUI.
+
+## Our other open source SwiftUI libraries
+[PopupView](https://github.com/exyte/PopupView) - Toasts and popups library    
+[Grid](https://github.com/exyte/Grid) - The most powerful Grid container    
+[ScalingHeaderScrollView](https://github.com/exyte/ScalingHeaderScrollView) - A scroll view with a sticky header which shrinks as you scroll.    
+[MediaPicker](https://github.com/exyte/mediapicker) - Customizable media picker     
+[ConcentricOnboarding](https://github.com/exyte/ConcentricOnboarding) - Animated onboarding flow    
+[FloatingButton](https://github.com/exyte/FloatingButton) - Floating button menu    
+[ActivityIndicatorView](https://github.com/exyte/ActivityIndicatorView) - A number of animated loading indicators    
+[ProgressIndicatorView](https://github.com/exyte/ProgressIndicatorView) - A number of animated progress indicators    
+[SVGView](https://github.com/exyte/SVGView) - SVG parser    
