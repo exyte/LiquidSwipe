@@ -1,5 +1,5 @@
 <img src="https://raw.githubusercontent.com/exyte/media/master/common/header.png">
-<img align="right" src="https://raw.githubusercontent.com/exyte/media/master/LiquidSwipe/demo.gif" width="480" />
+<img align="right" src="https://raw.githubusercontent.com/exyte/media/master/LiquidSwipe/demo.gif" width="250" />
 
 <p><h1 align="left">LiquidSwipe</h1></p>
 

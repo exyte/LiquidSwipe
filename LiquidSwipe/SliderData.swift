@@ -22,8 +22,7 @@ struct Config {
     static let waveMinHR = 48.0
     static let waveMinVR = 82.0
 
-    static let colors = [0x0074D9, 0x7FDBFF, 0x39CCCC, 0x3D9970, 0x2ECC40, 0x01FF70,
-                         0xFFDC00, 0xFF851B, 0xFF4136, 0xF012BE, 0xB10DC9, 0xAAAAAA]
+    static let colors = [0xF7A695, 0x8DAEF5, 0x2558D5, 0xECA23F, 0xF47153]
                         .shuffled().map { val in Color(hex: val) }
 
 }
