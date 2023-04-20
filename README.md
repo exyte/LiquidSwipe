@@ -10,8 +10,6 @@ ___
 <p> We are a development agency building
   <a href="https://clutch.co/profile/exyte#review-731233">phenomenal</a> apps.</p>
 
-</br>
-
 <a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
 
 # Usage
@@ -32,6 +30,7 @@ Many thanks to [Cuberto team](https://github.com/Cuberto/liquid-swipe) for their
 [ScalingHeaderScrollView](https://github.com/exyte/ScalingHeaderScrollView) - A scroll view with a sticky header which shrinks as you scroll  
 [AnimatedTabBar](https://github.com/exyte/AnimatedTabBar) - A tabbar with number of preset animations         
 [MediaPicker](https://github.com/exyte/mediapicker) - Customizable media picker     
+[Chat](https://github.com/exyte/chat) - Chat UI framework with fully customizable message cells, input view, and a built-in media picker      
 [ConcentricOnboarding](https://github.com/exyte/ConcentricOnboarding) - Animated onboarding flow    
 [FloatingButton](https://github.com/exyte/FloatingButton) - Floating button menu    
 [ActivityIndicatorView](https://github.com/exyte/ActivityIndicatorView) - A number of animated loading indicators    
