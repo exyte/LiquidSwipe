@@ -9,6 +9,8 @@
 
 <p><h4>Example of using SwiftUI to create a beautiful Liquid Swipe control</h4></p>
 
+<a href="https://exyte.com/blog/swiftui-tutorial-slider-control">Read Article »</a>
+
 # Usage
 This is a ready to run project. Please see more details in the [post](https://exyte.com/blog/swiftui-tutorial-slider-control).
 
